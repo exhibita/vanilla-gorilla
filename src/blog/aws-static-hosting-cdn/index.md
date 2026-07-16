@@ -60,6 +60,31 @@ Before you can automate your deployment using GitHub Actions, you need to config
 7. **Settings:**
   - **Default root object:**  Type `index.html`
 8. **Save:** Create the distribution and note down the **Distribution ID** and public domain name.
+9. **Open CloudFront Console** and click on **Functions** in the left sidebar.
+    - Click **Create function**, give it a name (e.g., RedirectSubdirectoryIndexes), and select CloudFront Functions v1.0 (or newer).
+    - Replace the boilerplate code with the following JavaScript:
+    ```
+    function handler(event) {
+        var request = event.request;
+        var uri = request.uri;
+    
+        // If the URI ends with a slash, append 'index.html'
+        if (uri.endsWith('/')) {
+            request.uri += 'index.html';
+        } 
+        // If the URI has no extension (pretty URL like /about), append '/index.html'
+        else if (!uri.includes('.')) {
+            request.uri += '/index.html';
+        }
+    
+        return request;
+    }
+    ```
+    - Click **Save**
+    - Click **Publish**
+    - Scroll down the page to **Associated distributions** and Click **Add to distribution**
+    - Select your CloudFront distribution from the dropdown
+    - **Save the association**
 
 #### C. Authorize Cloudfront to Access Your S3 Bucket
 Once your distribution is created, CloudFront will display a prominent banner at the top of the screen: "The S3 bucket policy needs to be updated..."
