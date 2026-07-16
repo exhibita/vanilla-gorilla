@@ -43,39 +43,46 @@ An S3 and CloudFront setup is immune to this:
 Before you can automate your deployment using GitHub Actions, you need to configure S3 and CloudFront in your AWS Management Console:
 
 #### A. Configure the Amazon S3 Bucket
-1. **Create a Bucket:** Go to the S3 console and create a bucket named after your target domain (e.g., `my-website.com`).
-2. **Enable Static Website Hosting:** In the bucket's **Properties** tab, scroll to the bottom, enable **Static website hosting**, and specify `index.html` as the Index document. Save the S3 website endpoint URL that is generated.
-3. **Disable Public Block Access:** Under the **Permissions** tab, edit "Block public access" and uncheck all boxes (this permits S3 to serve files to public visitors).
-4. **Attach a Bucket Policy:** Add the following bucket policy, replacing `my-website.com` with your bucket name, to allow public read access:
-   ```json
-   {
-     "Version": "2012-10-17",
-     "Statement": [
-       {
-         "Sid": "PublicReadGetObject",
-         "Effect": "Allow",
-         "Principal": "*",
-         "Action": "s3:GetObject",
-         "Resource": "arn:aws:s3:::my-website.com/*"
-       }
-     ]
-   }
-   ```
+1. **Create a Bucket:** Go to the S3 console and create a bucket named after your target domain (e.g., `my-website.com`) in the region closest to your target audience.
+2. **Block Public Access:** Keep "Block all public access" checked (this is highly recommended for security).
+3. **Leave Everything else as default** and click "Create Bucket"
+⚠️Note: Do not enable "Static website hosting" in S3. Keeping it disabled forces traffic to go through CloudFront, which is more secure and cost-efficient.
+4. **Click on your newly created bucket** and navigate to the **Permissions** tab
 
-#### B. Configure Amazon CloudFront
+#### B. Configure CloudFront Distribution with OAC
 1. **Create Distribution:** In the CloudFront console, click **Create Distribution**.
-2. **Origin Domain:** Paste your S3 **website endpoint** URL (e.g. `http://my-website.com.s3-website-us-east-1.amazonaws.com`) into the Origin Domain field. 
-   *(Note: Do not select the auto-suggested raw S3 bucket name. Using the website endpoint ensures S3 correctly resolves subfolder indexes and trailing-slash pretty URLs).*
-3. **Cache Policy:** Under Default Cache Behavior, choose **Redirect HTTP to HTTPS**. Set the cache policy to **CachingOptimized**.
-4. **Save:** Create the distribution and note down the **Distribution ID** and public domain name.
+2. **Origin Domain:** Click the text box and select your S3 bucket from the dropdown
+3. **Origin access:** Select **Origin access control settings (recommended)**.
+  - Click **Create control setting**. Leave the default settings (Sign requests) and click **Create**.
+4. **Viewer protocol policy:** Select Redirect HTTP to HTTPS (essential for security).
+5. **Cache key and origin requests:** Select Cache optimized (default).
+6. **Web Application Firewall (WAF):** Choose whether to enable security protections (you can select Do not enable for simple sites to save costs).
+7. **Settings:**
+  - **Default root object:**  Type `index.html`
+8. **Save:** Create the distribution and note down the **Distribution ID** and public domain name.
 
-#### C. Collect GitHub Deployment Secrets
+#### C. Authorize Cloudfront to Access Your S3 Bucket
+Once your distribution is created, CloudFront will display a prominent banner at the top of the screen: "The S3 bucket policy needs to be updated..."
+1. Click the **Copy policy** button on the banner.
+2. Go back to your S3 Bucket → Permissions tab.  Scroll down to Bucket policy and click Edit.
+3. Paste the copied `JSON` policy into the editor and click **Save changes**.
+This policy grants CloudFront's OAC permission to read objects (s3:GetObject) from your private bucket.
+
+#### D. Collect GitHub Deployment Secrets
 To authorize the GitHub Actions deploy workflow, you must generate an IAM User in AWS with `AmazonS3FullAccess` and `CloudFrontFullAccess` permissions. Collect the following information and add them as secrets in your GitHub repository under `Settings -> Secrets and variables -> Actions`:
 *   `AWS_ACCESS_KEY_ID` (Your IAM user access key)
 *   `AWS_SECRET_ACCESS_KEY` (Your IAM user secret key)
 *   `AWS_REGION` (e.g., `us-east-1`)
 *   `AWS_S3_BUCKET` (e.g., `my-website.com`)
-*   `AWS_CLOUDFRONT_DISTRIBUTION_ID` (Your CloudFront distribution ID)
+*   `AWS_CLOUDFRONT_DISTRIBUTION_ID` (Your CloudFront distribution ID) 
+You should collect this information and store it in your password manager or someplace safe as once you enter it into the GitHub secrets, you won't be able to retrieve the values and you don't want to have to generate new credentials each time.
+
+### E. (Optional) Custom Domain & SSL (HTTPS)
+If you want to use a custom domain (e.g., `my-website.com`) instead of the default `*.cloudfront.net` URL:
+1. **Request a Certificate:** In the AWS Certificate Manager (ACM) console, request a public certificate. Enter your custom domain name (e.g., `my-website.com`) and the wildcard `*.my-website.com`. ACM will guide you through a validation process (usually DNS-based) to prove ownership of the domain. **NOTE:** you must request the certificate int he US East (N. Virginia) region (us-east-1) for it to be valid for CloudFront.
+2. **Associate with CloudFront:** Go back to your CloudFront distribution settings → General tab → Edit. Add your domain name to the **Alternate domain names (CNAMEs)** field.
+3. In the **Custom SSL Certificate** section, select the certificate you just created.
+4. **Update DNS:** In your DNS provider (e.g., AWS Route 53, GoDaddy), create a CNAME record pointing your custom domain (e.g., `www.my-website.com`) to your CloudFront distribution's domain name (e.g., `d1234567890.cloudfront.net`).
 
 ### How to Deploy Your Vanilla Gorilla Site
 
