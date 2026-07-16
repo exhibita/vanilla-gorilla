@@ -131,8 +131,19 @@ header.site-header .container {
   color: var(--text-main);
 }
 
-.logo-wrapper span.gorilla-icon {
-  font-size: 1.75rem;
+.logo-wrapper img.gorilla-logo-img {
+  height: 2.25rem;
+  width: auto;
+  border-radius: 0;
+}
+
+img.gorilla-logo-img.footer-logo {
+  display: inline-block;
+  vertical-align: middle;
+  height: 1.25rem;
+  width: auto;
+  margin-top: -3px;
+  border-radius: 0;
 }
 
 .main-navigation ul {
