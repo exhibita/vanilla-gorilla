@@ -68,21 +68,60 @@ Once your distribution is created, CloudFront will display a prominent banner at
 3. Paste the copied `JSON` policy into the editor and click **Save changes**.
 This policy grants CloudFront's OAC permission to read objects (s3:GetObject) from your private bucket.
 
-#### D. Collect GitHub Deployment Secrets
-To authorize the GitHub Actions deploy workflow, you must generate an IAM User in AWS with `AmazonS3FullAccess` and `CloudFrontFullAccess` permissions. Collect the following information and add them as secrets in your GitHub repository under `Settings -> Secrets and variables -> Actions`:
+#### D. Set up IAM User to perform actions on your behalf
+To authorize the GitHub Actions deploy workflow, you must generate an IAM User in AWS and configure their permissions. While you could use AWS managed policies like `AmazonS3FullAccess` and `CloudFrontFullAccess`, we strongly recommend applying a **least-privilege policy** to ensure security. 
+
+Create an inline policy or a custom managed policy in AWS IAM and attach it to your IAM User (e.g., `Vanilla-Gorilla`). Be sure to replace `YOUR_BUCKET_NAME` and `YOUR_DISTRIBUTION_ID` with your actual resources:
+
+```json
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "S3SyncActions",
+            "Effect": "Allow",
+            "Action": [
+                "s3:PutObject",
+                "s3:GetObject",
+                "s3:ListBucket",
+                "s3:DeleteObject"
+            ],
+            "Resource": [
+                "arn:aws:s3:::YOUR_BUCKET_NAME",
+                "arn:aws:s3:::YOUR_BUCKET_NAME/*"
+            ]
+        },
+        {
+            "Sid": "CloudFrontInvalidation",
+            "Effect": "Allow",
+            "Action": [
+                "cloudfront:CreateInvalidation"
+            ],
+            "Resource": [
+                "arn:aws:cloudfront::*:distribution/YOUR_DISTRIBUTION_ID"
+            ]
+        }
+    ]
+}
+```
+
+#### E. Collect GitHub Deployment Secrets
+Collect the following credentials and details, and add them as secrets in your GitHub repository under `Settings -> Secrets and variables -> Actions`:
 *   `AWS_ACCESS_KEY_ID` (Your IAM user access key)
 *   `AWS_SECRET_ACCESS_KEY` (Your IAM user secret key)
 *   `AWS_REGION` (e.g., `us-east-1`)
 *   `AWS_S3_BUCKET` (e.g., `my-website.com`)
 *   `AWS_CLOUDFRONT_DISTRIBUTION_ID` (Your CloudFront distribution ID) 
+
 You should collect this information and store it in your password manager or someplace safe as once you enter it into the GitHub secrets, you won't be able to retrieve the values and you don't want to have to generate new credentials each time.
 
-### E. (Optional) Custom Domain & SSL (HTTPS)
+
+### F. (Optional) Custom Domain & SSL (HTTPS)
 If you want to use a custom domain (e.g., `my-website.com`) instead of the default `*.cloudfront.net` URL:
 1. **Request a Certificate:** In the AWS Certificate Manager (ACM) console, request a public certificate. Enter your custom domain name (e.g., `my-website.com`) and the wildcard `*.my-website.com`. ACM will guide you through a validation process (usually DNS-based) to prove ownership of the domain. **NOTE:** you must request the certificate int he US East (N. Virginia) region (us-east-1) for it to be valid for CloudFront.
 2. **Associate with CloudFront:** Go back to your CloudFront distribution settings → General tab → Edit. Add your domain name to the **Alternate domain names (CNAMEs)** field.
 3. In the **Custom SSL Certificate** section, select the certificate you just created.
-4. **Update DNS:** In your DNS provider (e.g., AWS Route 53, GoDaddy), create a CNAME record pointing your custom domain (e.g., `www.my-website.com`) to your CloudFront distribution's domain name (e.g., `d1234567890.cloudfront.net`).
+4. **Update DNS:** In your DNS provider (e.g., AWS Route 53, GoDaddy), create a CNAME record pointing your custom domain (e.g., `www.my-website.com`) to your CloudFront distribution's domain name (e.g., `XXXXXXXXXX.cloudfront.net`).
 
 ### How to Deploy Your Vanilla Gorilla Site
 
