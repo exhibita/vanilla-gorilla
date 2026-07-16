@@ -1,0 +1,92 @@
+<!--#include file="templates/header.html" -->
+
+<header class="page-header" style="margin-bottom: 2rem; text-align: center;">
+    <h1 class="page-title">Earthy Lightshow Gallery</h1>
+    <p style="color: var(--text-muted); font-size: 1.1rem; max-width: 600px; margin: 0 auto;">
+        A showcase of harmonious, earthy landscapes. Click any image to open the CSS-only Lightshow display.
+    </p>
+</header>
+
+<div class="gallery-grid" id="gallery">
+    <!-- Gallery Item 1 -->
+    <div class="gallery-item">
+        <a href="#img1">
+            <img src="./images/gallery/sage-horizon.png" alt="Sage Horizon">
+            <div class="gallery-caption">Sage Horizon</div>
+        </a>
+    </div>
+
+    <!-- Gallery Item 2 -->
+    <div class="gallery-item">
+        <a href="#img2">
+            <img src="./images/gallery/terracotta-hills.png" alt="Terracotta Hills">
+            <div class="gallery-caption">Terracotta Hills</div>
+        </a>
+    </div>
+
+    <!-- Gallery Item 3 -->
+    <div class="gallery-item">
+        <a href="#img3">
+            <img src="./images/gallery/golden-dunes.png" alt="Golden Dunes">
+            <div class="gallery-caption">Golden Dunes</div>
+        </a>
+    </div>
+
+    <!-- Gallery Item 4 -->
+    <div class="gallery-item">
+        <a href="#img4">
+            <img src="./images/gallery/earthy-peaks.png" alt="Earthy Peaks">
+            <div class="gallery-caption">Earthy Peaks</div>
+        </a>
+    </div>
+</div>
+
+<!-- ========================================== -->
+/* CSS-Only Lightbox Modals for Lightshow */
+<!-- ========================================== -->
+
+<!-- Lightbox 1 -->
+<div class="lightbox-target" id="img1">
+    <div class="lightbox-content">
+        <img src="./images/gallery/sage-horizon.png" alt="Sage Horizon">
+        <div class="lightbox-desc">Sage Horizon - Abstract representation of hills under a golden sun.</div>
+        <a class="lightbox-close" href="#gallery">&times;</a>
+        <a class="lightbox-nav lightbox-prev" href="#img4">&lsaquo;</a>
+        <a class="lightbox-nav lightbox-next" href="#img2">&rsaquo;</a>
+    </div>
+</div>
+
+<!-- Lightbox 2 -->
+<div class="lightbox-target" id="img2">
+    <div class="lightbox-content">
+        <img src="./images/gallery/terracotta-hills.png" alt="Terracotta Hills">
+        <div class="lightbox-desc">Terracotta Hills - Rich clay soils blending into high valleys.</div>
+        <a class="lightbox-close" href="#gallery">&times;</a>
+        <a class="lightbox-nav lightbox-prev" href="#img1">&lsaquo;</a>
+        <a class="lightbox-nav lightbox-next" href="#img3">&rsaquo;</a>
+    </div>
+</div>
+
+<!-- Lightbox 3 -->
+<div class="lightbox-target" id="img3">
+    <div class="lightbox-content">
+        <img src="./images/gallery/golden-dunes.png" alt="Golden Dunes">
+        <div class="lightbox-desc">Golden Dunes - Warm winds carving patterns in the ochre sand.</div>
+        <a class="lightbox-close" href="#gallery">&times;</a>
+        <a class="lightbox-nav lightbox-prev" href="#img2">&lsaquo;</a>
+        <a class="lightbox-nav lightbox-next" href="#img4">&rsaquo;</a>
+    </div>
+</div>
+
+<!-- Lightbox 4 -->
+<div class="lightbox-target" id="img4">
+    <div class="lightbox-content">
+        <img src="./images/gallery/earthy-peaks.png" alt="Earthy Peaks">
+        <div class="lightbox-desc">Earthy Peaks - Geometric ridges rising against a neutral sky.</div>
+        <a class="lightbox-close" href="#gallery">&times;</a>
+        <a class="lightbox-nav lightbox-prev" href="#img3">&lsaquo;</a>
+        <a class="lightbox-nav lightbox-next" href="#img1">&rsaquo;</a>
+    </div>
+</div>
+
+<!--#include file="templates/footer.html" -->

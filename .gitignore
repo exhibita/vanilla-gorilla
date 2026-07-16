@@ -1,0 +1,22 @@
+# Dependency directories
+node_modules/
+
+# Build output
+dist/
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+
+# IDE files
+.vscode/
+.idea/
+
+# Local env files
+.env*.local
+.env
+
+# System files
+.DS_Store
+Thumbs.db

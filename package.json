@@ -1,0 +1,20 @@
+{
+  "name": "vanilla-gorilla",
+  "version": "1.0.0",
+  "description": "A static site compiler that does the heavy lifting using vanilla JS, HTML, and agentic AI.",
+  "main": "build.js",
+  "type": "module",
+  "scripts": {
+    "build": "node minify.js && node build.js",
+    "watch": "node minify.js && node build.js --watch",
+    "create-page": "node create-page.js",
+    "create-md": "node create-page.js --md",
+    "invalidate": "node invalidate.js"
+  },
+  "dependencies": {
+    "cheerio": "^1.0.0-rc.12",
+    "chokidar": "^3.6.0",
+    "gray-matter": "^4.0.3",
+    "marked": "^18.0.5"
+  }
+}
