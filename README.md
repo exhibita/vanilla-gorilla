@@ -5,6 +5,11 @@ Vanilla Gorilla is a minimalist, lightning-fast static site compiler built on pu
 The repository is pre-optimized for **agentic workflows**—it includes native `.agents` instructions and skills so your AI assistant can construct pages, write blog posts, and manage style guides on your command.
 
 ---
+## Demo Site
+The official demo is located at [https://vg.exhibita.com](https://vg.exhibita.com).
+Other sites include:
+- [https://exhibita.com](https://exhibita.com) - This is written on the pre-cursor to the Vanilla Gorilla framework and will eventually be moved over to a full implementation of the Vanilla Gorilla framework.
+- [https://breezy.camp](coming soon) - A simple website built for my travelling companion Breezy using the framework.
 
 ## ⚡ Quickstart Commands
 
