@@ -6,10 +6,10 @@ The repository is pre-optimized for **agentic workflows**—it includes native `
 
 ---
 ## Demo Site
-The official demo is located at [https://vg.exhibita.com](https://vg.exhibita.com).
+The official demo is located at <a href="https://vg.exhibita.com" target="_blank">https://vg.exhibita.com</a>.
 Other sites include:
-- [https://exhibita.com](https://exhibita.com) - This is written on the pre-cursor to the Vanilla Gorilla framework and will eventually be moved over to a full implementation of the Vanilla Gorilla framework.
-- [https://breezy.camp](coming soon) - A simple website built for my travelling companion Breezy using the framework.
+- <a href="https://exhibita.com" target="_blank">https://exhibita.com</a> - This is written on the pre-cursor to the Vanilla Gorilla framework and will eventually be moved over to a full implementation of the Vanilla Gorilla framework.
+- <a href="https://breezy.camp" target="_blank">https://breezy.camp</a> - COMING SOON: A simple website built for my travelling companion Breezy using the framework.
 
 ## ⚡ Quickstart Commands
 
