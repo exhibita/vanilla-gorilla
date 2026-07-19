@@ -11,27 +11,31 @@ Other sites include:
 - <a href="https://exhibita.com" target="_blank">https://exhibita.com</a> - This is written on the pre-cursor to the Vanilla Gorilla framework and will eventually be moved over to a full implementation of the Vanilla Gorilla framework.
 - <a href="https://breezy.camp" target="_blank">https://breezy.camp</a> - COMING SOON: A simple website built for my travelling companion Breezy using the framework.
 
-## ⚡ Quickstart Commands
+## 🔥 Let's Fire This Up and get working now!
+
+If you are looking for the easiest way to get started with Vanilla Gorilla Static Site Generator, please follow the steps outlined in the (Easy Start Guide)[./docs/EASYSTART.md].
+
+## ⚡ Quickstart Command Reference
+
+### 0. Create your initial folder
+
+If you already have your computer set up for web development, you will most likely already have Node.JS, Git, and GitHub CLI installed and configured. If so, all you will need to do is run the following command from the folder that will be the parent of your SITENAME folder/directory where your project will run.
+`npx create-vanilla-gorilla SITENAME`
 
 ### 1. Install Dependencies
-Install development dependencies (`cheerio` for templates, `chokidar` for watching, `gray-matter` for frontmatter, and `marked` for markdown rendering):
-```bash
-npm install
-```
+After running the above command, you'll be presented with your immediate next steps. 
+![screenshot of the output from running npx create-vanilla-gorilla SITENAME](./src/images/create-vanilla-gorilla-screenshot.png)
+- Obviously, you'll want to `cd SITENAME` to change into the working directory for your project.
+- To install the development dependencies (`cheerio` for templates, `chokidar` for watching, `gray-matter` for frontmatter, and `marked` for markdown rendering) you will run `npm install`
+- To generate the site you will run `npm run watch`. This command will build the site and automatically monitors your source files for changes and instantly recompiles or restarts your application whenever you save a file. This way the files in the /dist folder will always be current to your saved changes so you can preview file changes in near-realtime.
 
 ### 2. Compile the Site
-Run a full build. This cleans the `/dist` directory, minifies the stylesheets, compiles all source HTML and Markdown pages, builds sitemaps and RSS feeds, and writes them to `/dist`:
+Run a full build after making changes if you haven't kept `npm run watch` running. This cleans the `/dist` directory, minifies the stylesheets, compiles all source HTML and Markdown pages, builds sitemaps and RSS feeds, and writes them to `/dist`:
 ```bash
 npm run build
 ```
 
-### 3. Watch for Changes (Local Development)
-Start the watch compiler. It monitors the `/src` folder, recompiling outputs instantly as you edit:
-```bash
-npm run watch
-```
-
-### 4. Create a Prettified Page (Pretty URLs)
+### 3. Create a Prettified Page (Pretty URLs)
 To maintain beautiful directory-style URLs (e.g. `/blog/my-post/` instead of `/blog/my-post.html`), Vanilla Gorilla compiles every slug target as `index.html` inside a subfolder named after the slug.
 
 To scaffold a new page or blog post with appropriate relative path nesting:
