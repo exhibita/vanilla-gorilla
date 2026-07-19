@@ -85,6 +85,9 @@ The stylesheet `src/css/style.css` provides a simple, light-background organic s
 ### CSS-Only Lightshow Lightbox
 The gallery skeleton (`src/skeletons/gallery-skeleton.html`) features a pure-CSS interactive Lightshow lightbox. By targeting elements via the CSS `:target` selector, clicking an image triggers a modal overlay without using a single line of client-side JavaScript. This preserves lightning-fast load times.
 
+### Building Your Own Theme
+Want to replace the default look, or port an existing website into Vanilla Gorilla? See [docs/THEMING.md](docs/THEMING.md) for a full guide to the template/skeleton system and a step-by-step conversion walkthrough.
+
 ---
 
 ## 🤖 AI Agent Workflow
