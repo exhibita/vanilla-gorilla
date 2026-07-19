@@ -119,6 +119,10 @@ There's currently no mechanism to keep several themes side by side and pick one 
 
 The general approach: pull the repeated chrome (nav, head boilerplate, footer) out into `templates/header.html`/`footer.html`, decide per content-type whether pages will be static HTML or Markdown-authored, and adjust every link to be `./`-relative.
 
+### Step 0 - Consider using your AI Agent to do the work for you
+
+Vanilla Gorilla has recently added a new skill that will guide and assist you through applying an existing design into your new site. You have the choice of pointing to an existing sketch, local static file(s), a live URL, or a Figma sketch. This skill is normally launched by inference in conversation with your Agent but can also be called directly using the name `design-apply` in the manner that is appropriate to your particular Agent.
+
 ### Step 1 — Extract header/footer
 
 Take any representative page from the existing site. Find the split point — usually right after the opening `<nav>`/site-chrome and right before the closing `</main>`/footer markup. Put everything above that point into `src/templates/header.html`, everything below it into `src/templates/footer.html`. Keep both halves *unclosed*/*unopened* respectively, exactly like the shipped theme does.
