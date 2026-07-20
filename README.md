@@ -13,7 +13,7 @@ Other sites include:
 
 ## 🔥 Let's Fire This Up and get working now!
 
-If you are looking for the easiest way to get started with Vanilla Gorilla Static Site Generator, please follow the steps outlined in the (Easy Start Guide)[./docs/EASYSTART.md].
+If you are looking for the easiest way to get started with Vanilla Gorilla Static Site Generator, please follow the steps outlined in the [Easy Start Guide](./docs/EASYSTART.md).
 
 ## ⚡ Quickstart Command Reference
 
@@ -97,6 +97,7 @@ Want to replace the default look, or port an existing website into Vanilla Goril
 ## 🤖 AI Agent Workflow
 
 If you are using an agentic IDE (like Antigravity IDE), the AI assistant is configured to understand your framework layout and rules automatically. You can command your agent to:
+*   *“Using the /design-apply skill, can you assist me in applying a new design to my site?”*
 *   *“Create a new blog post about vanilla coding.”*
 *   *“Generate a new photography gallery page from the gallery skeleton.”*
 *   *“Refactor the earthy styling to add a new button component.”*
