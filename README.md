@@ -13,7 +13,7 @@ Other sites include:
 
 ## 🔥 Let's Fire This Up and get working now!
 
-If you are looking for the easiest way to get started with Vanilla Gorilla Static Site Generator, please follow the steps outlined in the (Easy Start Guide)[./docs/EASYSTART.md].
+If you are looking for the easiest way to get started with Vanilla Gorilla Static Site Generator, please follow the steps outlined in the [Easy Start Guide](./docs/EASYSTART.md).
 
 ## ⚡ Quickstart Command Reference
 
