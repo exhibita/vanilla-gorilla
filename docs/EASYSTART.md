@@ -117,7 +117,7 @@ Working with Branches locally and remotely (along with Pull Requests) are outsid
 
 Since Vanilla Gorilla's sole purpose is to allow you to quickly and easily create, edit, and manage static Vanilla websites, we've added two features to assist you in with Continuous Deployments by triggering a deployment as soon as you commit changes to the **main** branch of your GitHub (remote) repository. Both of these leverage GitHub actions. In the ./.github/workflows folder you'll find deploy.yml and pages.yml files.
 
-- deploy.yml is designed to trigger an insert (or update) of files and other assets to a site hosted on S3 and using CloudFront (both products of AWS). Please see the blog post about [Choosing Your Hosting Strategy](../src/blog/choosing-your-hosting-strategy/index.md) (or on [our site](https://vg.exhibita.com/blog/choosing-your-hosting-strategy/") if you've cleared the initially loaded blog pages).
+- deploy.yml is designed to trigger an insert (or update) of files and other assets to a site hosted on S3 and using CloudFront (both products of AWS). Please see the blog post about [Choosing Your Hosting Strategy](../src/blog/choosing-your-hosting-strategy/index.md) (or on [our site](https://vg.exhibita.com/blog/choosing-your-hosting-strategy/) if you've cleared the initially loaded blog pages).
 - pages.yml is desi9gned to deploy the contents of your site to GitHub hosted sites.
 Either of these options will require that you create to:
 1. create the initially hosted storage in AWS or GitHub
