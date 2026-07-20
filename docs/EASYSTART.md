@@ -93,19 +93,35 @@ Once built, you can use a web-browser to open up the index.html file found in th
 
 We have included a [THEMING document](./THEMING.md) in the /docs folder that explains how to adapt an existing design to work with our system. Pay special attention to sections 2 & 3 to understand the process of either creating a new design from scratch or converting from a pre-existing website.
 
-Note that in initial testing using our favorite AI coding tools, we were able to get them to do the initial heavy lifting on this. This is an example of a prompt that was successful in doing the work for us (assuming that the AI converstion is started in or has the working directory attached to it):
-> Using the docs/THEMING.md in this repository, I'd like you to look at the style used in the static html files found at c:\users\micha\DOcuments\Repos\ExhibitA\Breezy.camp\scraped-site\index.html and apply the transformations found in the THEMING doc (paying special attention to the required css and html elements) to create the CSS, skeleton, and template files in this folder. You may overwrite the exiting index.html, css, and template/skeleton files to apply this new design to this site to be built with Vanilla Gorilla static site generation system.
-
-Of course, your mileage and tool set may vary so play around with the wording and/or prompt to best suit your needs.
+The simplest way to apply your design is the leverage the `design-apply` skill that we've made available to the Agent assisting you. You can call it directly or by inference and it will walk you through the process of the conversion and allows for iterative corrections once the first pass has been approved. Design source input can come from a local sketch, from a local static web page, from a live URL, or from Figma sketch ID or URL.
 
 ### Testing your design changes locally
 
-blah, blah, blah
+To test your design changes locally, you can either work with the agent to allow for iterative changes that, when displayed, can be approved or redirected as appropriate.
 
-### Pushing your changes to your remote repository
+Alternatively you can make changes to the CSS and HTML of your site locally. If you are currently running `npm run watch` the /dist folder will be kept up to date and ready for review locally in a browser. If you are not keeping the watch running just run `npm run build` and view the changes in our browser.
 
-blah, blah, blah
+If you are doing your work in an IDE that is based off of VS Code (like Antigravity) you can install the Live Server extension by Ritwick Dey and you can right click to view files in the /dist folder to view your changes on the browser of your choice.
+
+### Git and Remote Repositories In a Nutshell
+
+All of the work you've been doing to this point time is local to your computer. The normal flow after you've been working on changes is to issue the command `git add .` inside of your terminal for the project's working directory/folder. This will stage the files for commitment.
+
+To commit the files that you have staged you would use the command `git commit -m "COMMIT MESSAGE GOES HERE"`. This will store all the changes from the current session in your local git repository history. 
+
+If you have created a remote repository for your code on GitHub, and at its most simplest level, you can push your locally committed changes to the remote main branch using the command `git push origin main`.
+
+Working with Branches locally and remotely (along with Pull Requests) are outside the scope of this document. If you are doing this and don't recall the commands to us, you can always ask your Agent for help (and possibly education) on the matter of local vs remote Git and Branching work off of the **main** branch.
 
 ## Deploying your Website to Hosting
 
-blah, blah, blah
+Since Vanilla Gorilla's sole purpose is to allow you to quickly and easily create, edit, and manage static Vanilla websites, we've added two features to assist you in with Continuous Deployments by triggering a deployment as soon as you commit changes to the **main** branch of your GitHub (remote) repository. Both of these leverage GitHub actions. In the ./.github/workflows folder you'll find deploy.yml and pages.yml files.
+
+- deploy.yml is designed to trigger an insert (or update) of files and other assets to a site hosted on S3 and using CloudFront (both products of AWS). Please see the blog post about [Choosing Your Hosting Strategy](../src/blog/choosing-your-hosting-strategy/index.md) (or on [our site](https://vg.exhibita.com/blog/choosing-your-hosting-strategy/") if you've cleared the initially loaded blog pages).
+- pages.yml is desi9gned to deploy the contents of your site to GitHub hosted sites.
+Either of these options will require that you create to:
+1. create the initially hosted storage in AWS or GitHub
+2. add new Repository environmental variables in your GitHub project's settings under Secrets | Repository Secrets.
+3. delete the file for the method you are **NOT** using from the /.github/workflows/ folder
+
+If you like doing it all manually, you can take the contents of the /dist folder and its children, and copy them (via FTP or SCP) to your hosting server of choice.
