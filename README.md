@@ -13,7 +13,7 @@ Other sites include:
 
 ## 🔥 Let's Fire This Up and get working now!
 
-If you are looking for the easiest way to get started with Vanilla Gorilla Static Site Generator, please follow the steps outlined in the [Easy Start Guide](./docs/EASYSTART.md).
+If you are looking for the easiest way to get started with Vanilla Gorilla Static Site Generator, please follow the steps outlined in the (Easy Start Guide)[./docs/EASYSTART.md].
 
 ## ⚡ Quickstart Command Reference
 
@@ -90,7 +90,7 @@ The stylesheet `src/css/style.css` provides a simple, light-background organic s
 The gallery skeleton (`src/skeletons/gallery-skeleton.html`) features a pure-CSS interactive Lightshow lightbox. By targeting elements via the CSS `:target` selector, clicking an image triggers a modal overlay without using a single line of client-side JavaScript. This preserves lightning-fast load times.
 
 ### Building Your Own Theme
-Want to replace the default look, or port an existing website into Vanilla Gorilla? See [docs/THEMING.md](docs/THEMING.md) for a full guide to the template/skeleton system and a step-by-step conversion walkthrough.
+Want to replace the default look, or port an existing website into Vanilla Gorilla? See [docs/THEMING.md](docs/THEMING.md) for a full guide to the template/skeleton system and a step-by-step conversion walkthrough. We have included a SKILL called design-apply that you can reference directly or by inference to allow the agent(s) to accomplish this task for you.
 
 ---
 
