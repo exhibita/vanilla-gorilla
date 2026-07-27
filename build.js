@@ -41,7 +41,7 @@ const blogPosts = new Map();
 const galleries = new Map();
 
 function gallerySlugFor(relativePath) {
-    const parts = relativePath.split(path.sep);
+    const parts = relativePath.split(/[\\/]/);
     if (parts.length !== 3 || parts[0] !== 'gallery') return null;
     if (parts[2] !== 'index.html' && parts[2] !== 'index.md') return null;
     return parts[1];
@@ -57,7 +57,7 @@ async function cleanDist() {
 // Helper to get directory nesting depth relative to SRC_DIR
 function getDepth(filePath) {
     const relativePath = path.relative(SRC_DIR, filePath);
-    const parts = relativePath.split(path.sep);
+    const parts = relativePath.split(/[\\/]/);
     return parts.length - 1; // index.html is depth 0, blog/my-post/index.html is depth 2
 }
 
@@ -120,7 +120,7 @@ async function expandIncludes(content, filePath) {
 // True if this src-relative path is a blog post page (blog/<slug>/index.*),
 // excluding the blog index itself and the author pages.
 function blogSlugFor(relativePath) {
-    const parts = relativePath.split(path.sep);
+    const parts = relativePath.split(/[\\/]/);
     if (parts.length !== 3 || parts[0] !== 'blog' || parts[1] === 'author') return null;
     if (parts[2] !== 'index.html' && parts[2] !== 'index.md') return null;
     return parts[1];
@@ -201,7 +201,7 @@ async function compileHtmlFile(filePath) {
     const destPath = path.join(DIST_DIR, relativePath);
 
     // Skip templates and skeletons
-    const parts = relativePath.split(path.sep);
+    const parts = relativePath.split(/[\\/]/);
     if (parts[0] === 'templates' || parts[0] === 'skeletons') {
         return;
     }
@@ -238,7 +238,7 @@ async function compileMarkdownFile(filePath) {
     const relativePath = path.relative(SRC_DIR, filePath);
 
     // Skip templates and skeletons
-    const parts = relativePath.split(path.sep);
+    const parts = relativePath.split(/[\\/]/);
     if (parts[0] === 'templates' || parts[0] === 'skeletons') {
         return;
     }
@@ -333,14 +333,25 @@ async function copyAsset(filePath) {
     const destPath = path.join(DIST_DIR, relativePath);
 
     // Skip templates and skeletons
-    const parts = relativePath.split(path.sep);
+    const parts = relativePath.split(/[\\/]/);
     if (parts[0] === 'templates' || parts[0] === 'skeletons') {
         return;
     }
 
+    try {
+        if (existsSync(filePath)) {
+            const stat = await fs.stat(filePath);
+            if (stat.isDirectory()) {
+                await fs.mkdir(destPath, { recursive: true });
+                return;
+            }
+        }
     await fs.mkdir(path.dirname(destPath), { recursive: true });
     await fs.copyFile(filePath, destPath);
     console.log(`Copied asset: ${relativePath}`);
+    } catch (err) {
+        console.error(`Error copying asset ${relativePath}:`, err.message);
+    }
 }
 
 // Get sorted list of blog posts
@@ -674,17 +685,25 @@ async function main() {
     if (isWatch) {
         console.log('\nWatching for changes in src/...\n');
         const watcher = chokidar.watch(SRC_DIR, {
-            ignored: /(^|[\/\\])\../,
+            ignored: [
+                /(^|[\/\\])\../,
+                /templates[\/\\]recent-posts\.html$/
+            ],
             persistent: true,
             ignoreInitial: true
         });
 
         watcher.on('all', async (event, filePath) => {
             const relativePath = path.relative(SRC_DIR, filePath);
-            const parts = relativePath.split(path.sep);
+            const parts = relativePath.split(/[\\/]/);
 
-            if (parts[0] === 'templates') {
-                console.log(`\nTemplate changed (${relativePath}). Rebuilding all files...`);
+            if (parts[0] === 'templates' || parts[0] === 'skeletons') {
+                // Ignore the auto-generated recent posts include file to prevent an infinite loop
+                if (parts[0] === 'templates' && parts[1] === 'recent-posts.html') {
+                    return;
+                }
+                const itemType = parts[0] === 'skeletons' ? 'Skeleton' : 'Template';
+                console.log(`\n${itemType} changed (${relativePath}). Rebuilding all files...`);
                 try {
                     await buildAll();
                     await generateBlogArtifacts();
@@ -695,14 +714,14 @@ async function main() {
                 return;
             }
 
-            if (parts[0] === 'skeletons') {
-                return;
-            }
-
             const isBlogPost = blogSlugFor(relativePath) !== null;
 
-            if (event === 'add' || event === 'change') {
+            if (event === 'add' || event === 'change' || event === 'addDir') {
                 try {
+                    if (event === 'addDir') {
+                        await copyAsset(filePath);
+                        return;
+                    }
                     if (filePath.endsWith('.html')) {
                         await compileHtmlFile(filePath);
                     } else if (filePath.endsWith('.md')) {
@@ -730,12 +749,37 @@ async function main() {
                 } catch (err) {
                     console.error(`Error processing file ${relativePath}:`, err);
                 }
-            } else if (event === 'unlink') {
+            } else if (event === 'unlink' || event === 'unlinkDir') {
+                try {
+                    if (event === 'unlinkDir') {
+                        const destPath = path.join(DIST_DIR, relativePath);
+                        if (existsSync(destPath)) {
+                            await fs.rm(destPath, { recursive: true, force: true });
+                            console.log(`Deleted directory: ${relativePath}`);
+                        }
+                        return;
+                    }
+                    if (filePath.endsWith('.html')) {
+                        const siblingMd = filePath.replace(/\.html$/, '.md');
+                        if (existsSync(siblingMd)) {
+                            console.log(`HTML deleted (${relativePath}), but sibling ${path.relative(SRC_DIR, siblingMd)} exists. Recompiling markdown...`);
+                            await compileMarkdownFile(siblingMd);
+                            return;
+                        }
+                    } else if (filePath.endsWith('.md')) {
+                        const siblingHtml = filePath.replace(/\.md$/, '.html');
+                        if (existsSync(siblingHtml)) {
+                            console.log(`Markdown deleted (${relativePath}), but sibling ${path.relative(SRC_DIR, siblingHtml)} exists. Recompiling HTML...`);
+                            await compileHtmlFile(siblingHtml);
+                            return;
+                        }
+                    }
+
                 const destRelative = relativePath.endsWith('.md')
                     ? relativePath.replace(/\.md$/, '.html')
                     : relativePath;
                 const destPath = path.join(DIST_DIR, destRelative);
-                try {
+
                     if (existsSync(destPath)) {
                         await fs.unlink(destPath);
                         console.log(`Deleted: ${destRelative}`);
