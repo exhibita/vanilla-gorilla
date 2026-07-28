@@ -70,10 +70,11 @@ where SITENAME is the name of the folder/directory to hold your new site. This c
 Vanilla Gorilla will automatically create a local git repository in your site's working directory. If you wish to create a remote repository in your GitHub account, you would follow the following series of steps.
 
 1. Stage and commit your local files (to your local git repo)
-`
+```
+git init
 git add .
 git commit -m "chore: initial commit"
-`
+```
 2. Create and link the private repository on GitHub
 `
 gh repo create exhibita/SITENAME --private --source=. --remote=origin --push
