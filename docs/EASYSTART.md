@@ -71,18 +71,21 @@ Vanilla Gorilla will automatically create a local git repository in your site's 
 
 1. Stage and commit your local files (to your local git repo)
 ```
-git init
-git add .
-git commit -m "chore: initial commit"
+# From your SITENAME folder
+git init  # set up this folder to use git for version control
+git add . # add everything that has changed into git
+git commit -m "chore: initial commit" # commit locally 
 ```
 2. Create and link the private repository on GitHub
-`
-gh repo create exhibita/SITENAME --private --source=. --remote=origin --push
-`
+```
+# ACCOUNTNAME Is your git account name
+# SITENAME is the name of your site as determined at the top of this document
+gh repo create ACCOUNTNAME/SITENAME --private --source=. --remote=origin --push
+```
 3. If you'd like to make your repository public use the following commands:
-`
-gh repo create exhibita/breezy.camp --public --source=. --remote=origin --push
-`   
+```
+gh repo create ACCOUNTNAME/SITENAME --public --source=. --remote=origin --push
+```  
 
 ## Building and maintaining your site
 
@@ -120,6 +123,7 @@ Since Vanilla Gorilla's sole purpose is to allow you to quickly and easily creat
 
 - deploy.yml is designed to trigger an insert (or update) of files and other assets to a site hosted on S3 and using CloudFront (both products of AWS). Please see the blog post about [Choosing Your Hosting Strategy](../src/blog/choosing-your-hosting-strategy/index.md) (or on [our site](https://vg.exhibita.com/blog/choosing-your-hosting-strategy/) if you've cleared the initially loaded blog pages).
 - pages.yml is desi9gned to deploy the contents of your site to GitHub hosted sites.
+  
 Either of these options will require that you create to:
 1. create the initially hosted storage in AWS or GitHub
 2. add new Repository environmental variables in your GitHub project's settings under Secrets | Repository Secrets.
