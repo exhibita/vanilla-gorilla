@@ -887,7 +887,8 @@ async function main() {
 
 // Generate the gallery index
 async function generateGalleryIndex() {
-    if (galleries.size === 0) {
+    // With no galleries, keep a hand-built src/gallery/index.html; otherwise generate an empty index.
+    if (galleries.size === 0 && existsSync(path.join(SRC_DIR, 'gallery', 'index.html'))) {
         return;
     }
 
@@ -922,7 +923,7 @@ async function generateGalleryIndex() {
             const descriptionHtml = gallery.description
                 ? `<p style="margin: 0.5rem 0 0; font-size: 0.8rem; opacity: 0.8; font-weight: normal;">${escapeHtml(gallery.description)}</p>`
                 : '';
-            const coverSrc = gallery.cover || `${hrefPrefix}images/gallery/sage-horizon.png`;
+            const coverSrc = gallery.cover || './images/gallery/sage-horizon.png';
             return `        <div class="gallery-item">
             <a href="${hrefPrefix}${encodeURI(gallery.slug)}/">
                 <img src="${coverSrc}" alt="${escapeHtml(gallery.title)}">

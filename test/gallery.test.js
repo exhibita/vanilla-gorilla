@@ -147,3 +147,8 @@ test('the gallery index uses the first image as the cover', () => {
     const $ = load('gallery/index.html');
     assert.equal($('a[href="beach-trip/"] img').attr('src'), '../images/gallery/beach-trip/one.jpg');
 });
+
+test('a gallery with no images gets the default cover on the index', () => {
+    const $ = load('gallery/index.html');
+    assert.equal($('a[href="empty-gallery/"] img').attr('src'), '../images/gallery/sage-horizon.png');
+});
