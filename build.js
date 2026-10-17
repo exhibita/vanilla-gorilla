@@ -143,6 +143,11 @@ function parseFrontmatterDate(value) {
     return null;
 }
 
+// A Markdown page with "draft: true" in its front matter is not published.
+function isDraft(frontmatter) {
+    return frontmatter.draft === true || String(frontmatter.draft).toLowerCase() === 'true';
+}
+
 function truncateText(text, max = 200) {
     const clean = text.replace(/\s+/g, ' ').trim();
     if (clean.length <= max) return clean;
@@ -257,6 +262,14 @@ async function compileMarkdownFile(filePath) {
     const raw = await fs.readFile(filePath, 'utf8');
     const { data: frontmatter, content: markdownBody } = matter(raw);
 
+    if (isDraft(frontmatter)) {
+        console.log(`Skipping draft: ${relativePath}`);
+        blogPosts.delete(blogSlugFor(relativePath));
+        galleries.delete(gallerySlugFor(relativePath));
+        await fs.rm(destPath, { force: true });
+        return;
+    }
+
     if (!frontmatter.title) {
         console.warn(`Warning: Skipping ${relativePath}: frontmatter is missing required "title" field.`);
         return;
@@ -273,6 +286,7 @@ async function compileMarkdownFile(filePath) {
     const date = parseFrontmatterDate(frontmatter.date);
 
     const slug = blogSlugFor(relativePath);
+    const images = galleryImages(frontmatter, relativePath);
 
     const skeletonContent = await fs.readFile(skeletonPath, 'utf8');
     const $ = cheerio.load(skeletonContent);
@@ -280,6 +294,9 @@ async function compileMarkdownFile(filePath) {
     // Inject title, body, and dates
     $('title').text(`${frontmatter.title} - ${SITE_TITLE}`);
     $('.entry-title').text(frontmatter.title);
+    if ($('#gallery').length) {
+        renderGallery($, images);
+    }
     $('.entry-content').html(bodyHtml);
 
     const $time = $('time.entry-date');
@@ -319,7 +336,7 @@ async function compileMarkdownFile(filePath) {
     if (gallerySlug) {
         const description = frontmatter.description
             || truncateText(cheerio.load(bodyHtml)('p').first().text());
-        const cover = frontmatter.cover || cheerio.load(bodyHtml)('img').first().attr('src') || '';
+        const cover = frontmatter.cover || images[0]?.src || cheerio.load(bodyHtml)('img').first().attr('src') || '';
         galleries.set(gallerySlug, { slug: gallerySlug, title: frontmatter.title, date, description, cover });
     }
 
@@ -372,6 +389,71 @@ function escapeHtml(text) {
 
 function escapeXml(text) {
     return escapeHtml(text).replace(/'/g, '&apos;');
+}
+
+// Make a gallery image path start with "./" so adjustDocumentLinks can fix it for the page depth.
+function relativeImagePath(imagePath) {
+    if (/^(\.{0,2}\/|[a-z][a-z0-9+.-]*:)/i.test(imagePath)) return imagePath;
+    return `./${imagePath}`;
+}
+
+// Read the "images:" front matter list. Return the usable entries as { src, alt, caption }.
+function galleryImages(frontmatter, relativePath) {
+    if (frontmatter.images === undefined) return [];
+    if (!Array.isArray(frontmatter.images)) {
+        console.warn(`Warning: ${relativePath}: "images" must be a list; ignoring it.`);
+        return [];
+    }
+
+    const images = [];
+    frontmatter.images.forEach((image, i) => {
+        if (!image || typeof image.path !== 'string' || !image.path.trim()) {
+            console.warn(`Warning: ${relativePath}: images[${i}] has no "path"; skipping it.`);
+            return;
+        }
+        images.push({
+            src: relativeImagePath(image.path.trim()),
+            alt: String(image.alt ?? image.caption ?? ''),
+            caption: image.caption == null ? '' : String(image.caption)
+        });
+    });
+    return images;
+}
+
+// Fill the gallery skeleton's #gallery grid and #gallery-lightboxes with CSS-only lightbox markup.
+function renderGallery($, images) {
+    const count = images.length;
+
+    const items = images.map((image, i) => {
+        const captionHtml = image.caption
+            ? `\n            <div class="gallery-caption">${escapeHtml(image.caption)}</div>`
+            : '';
+        return `    <div class="gallery-item">
+        <a href="#img${i + 1}">
+            <img src="${escapeHtml(image.src)}" alt="${escapeHtml(image.alt)}">${captionHtml}
+        </a>
+    </div>`;
+    }).join('\n');
+
+    const lightboxes = images.map((image, i) => {
+        const prev = ((i - 1 + count) % count) + 1;
+        const next = ((i + 1) % count) + 1;
+        const descHtml = image.caption
+            ? `\n        <div class="lightbox-desc">${escapeHtml(image.caption)}</div>`
+            : '';
+        const navHtml = count > 1
+            ? `\n        <a class="lightbox-nav lightbox-prev" href="#img${prev}">&lsaquo;</a>\n        <a class="lightbox-nav lightbox-next" href="#img${next}">&rsaquo;</a>`
+            : '';
+        return `<div class="lightbox-target" id="img${i + 1}">
+    <div class="lightbox-content">
+        <img src="${escapeHtml(image.src)}" alt="${escapeHtml(image.alt)}">${descHtml}
+        <a class="lightbox-close" href="#gallery">&times;</a>${navHtml}
+    </div>
+</div>`;
+    }).join('\n');
+
+    $('#gallery').html(`\n${items}\n`);
+    $('#gallery-lightboxes').html(`\n${lightboxes}\n`);
 }
 
 // Generate the blog index
@@ -618,7 +700,7 @@ async function collectAllMetadata(dir = SRC_DIR) {
                 } else if (entry.name.endsWith('.md')) {
                     const raw = await fs.readFile(fullPath, 'utf8');
                     const { data: frontmatter, content: markdownBody } = matter(raw);
-                    if (frontmatter.title) {
+                    if (frontmatter.title && !isDraft(frontmatter)) {
                         const date = parseFrontmatterDate(frontmatter.date);
                         const description = frontmatter.description
                             || truncateText(cheerio.load(marked.parse(markdownBody))('p').first().text());
@@ -632,11 +714,13 @@ async function collectAllMetadata(dir = SRC_DIR) {
                 } else if (entry.name.endsWith('.md')) {
                     const raw = await fs.readFile(fullPath, 'utf8');
                     const { data: frontmatter, content: markdownBody } = matter(raw);
-                    if (frontmatter.title) {
+                    if (frontmatter.title && !isDraft(frontmatter)) {
                         const date = parseFrontmatterDate(frontmatter.date);
                         const description = frontmatter.description
                             || truncateText(cheerio.load(marked.parse(markdownBody))('p').first().text());
-                        const cover = frontmatter.cover || cheerio.load(marked.parse(markdownBody))('img').first().attr('src') || '';
+                        const cover = frontmatter.cover
+                            || galleryImages(frontmatter, relativePath)[0]?.src
+                            || cheerio.load(marked.parse(markdownBody))('img').first().attr('src') || '';
                         galleries.set(gallerySlug, { slug: gallerySlug, title: frontmatter.title, date, description, cover });
                     }
                 }
@@ -803,7 +887,8 @@ async function main() {
 
 // Generate the gallery index
 async function generateGalleryIndex() {
-    if (galleries.size === 0) {
+    // With no galleries, keep a hand-built src/gallery/index.html; otherwise generate an empty index.
+    if (galleries.size === 0 && existsSync(path.join(SRC_DIR, 'gallery', 'index.html'))) {
         return;
     }
 
@@ -838,7 +923,7 @@ async function generateGalleryIndex() {
             const descriptionHtml = gallery.description
                 ? `<p style="margin: 0.5rem 0 0; font-size: 0.8rem; opacity: 0.8; font-weight: normal;">${escapeHtml(gallery.description)}</p>`
                 : '';
-            const coverSrc = gallery.cover || `${hrefPrefix}images/gallery/sage-horizon.png`;
+            const coverSrc = gallery.cover || './images/gallery/sage-horizon.png';
             return `        <div class="gallery-item">
             <a href="${hrefPrefix}${encodeURI(gallery.slug)}/">
                 <img src="${coverSrc}" alt="${escapeHtml(gallery.title)}">
