@@ -15,11 +15,13 @@ Use this skill when the user commands you to create a new page, blog post, or ar
     - **For Markdown**: Run `npm run create-md -- <skeleton-type> <path>`
       *Example: `npm run create-md -- blog blog/my-new-post`*
     - **For HTML**: Run `npm run create-page -- <skeleton-type> <path>`
-      *Example: `npm run create-page -- gallery gallery/travel-photos`*
+      *Example: `npm run create-page -- page my-custom-page`*
+    - **For a gallery**: Run `npm run create-md -- gallery gallery/<slug>`, then add an `images:` list (`path`, `alt`, `caption` for each image) to the front matter. Put the images in `src/images/gallery/<slug>/`. See `docs/UPGRADE-v2.md`.
 4.  **Generate Content**:
     - Open the newly generated file (e.g., `src/blog/my-new-post/index.md`).
     - Populate high-quality, professional, and SEO-friendly content based on the user's instructions.
     - Keep the frontmatter header intact. Fill in `title`, `date` (format YYYY-MM-DD), and `description` (for SEO and RSS).
+    - To keep a page unpublished, add `draft: true` to the front matter.
 5.  **Build & Verify**:
     - Run `npm run build` to compile the page into the `dist/` directory.
     - Inspect the compiled page (e.g., `dist/blog/my-new-post/index.html`) to ensure SSI includes and relative paths resolved correctly.

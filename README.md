@@ -45,8 +45,13 @@ To scaffold a new page or blog post with appropriate relative path nesting:
   ```
 - **HTML page (for custom layouts)**:
   ```bash
-  npm run create-page -- gallery gallery/travel-photos
+  npm run create-page -- page my-custom-page
   ```
+- **Gallery**: create a Markdown page with the `gallery` skeleton, then add an `images:` list to its front matter (see [docs/UPGRADE-v2.md](docs/UPGRADE-v2.md#galleries)):
+  ```bash
+  npm run create-md -- gallery gallery/travel-photos
+  ```
+- **Draft**: add `draft: true` to the front matter of a Markdown page. The build does not publish it.
 
 ---
 
@@ -87,7 +92,9 @@ The stylesheet `src/css/style.css` provides a simple, light-background organic s
 *   Elegant pairing of `Outfit` (sans-serif) and `Playfair Display` (serif) typography.
 
 ### CSS-Only Lightshow Lightbox
-The gallery skeleton (`src/skeletons/gallery-skeleton.html`) features a pure-CSS interactive Lightshow lightbox. By targeting elements via the CSS `:target` selector, clicking an image triggers a modal overlay without using a single line of client-side JavaScript. This preserves lightning-fast load times.
+The gallery skeleton (`src/skeletons/gallery-skeleton.html`) features a pure-CSS interactive Lightshow lightbox. List the images in the `images:` front matter of a gallery page, and `build.js` generates the grid and the lightbox. By targeting elements via the CSS `:target` selector, clicking an image triggers a modal overlay without using a single line of client-side JavaScript. This preserves lightning-fast load times.
+
+This is template version 2 (`"vanillaGorilla": { "templateVersion": 2 }` in `package.json`). To upgrade an older site, see [docs/UPGRADE-v2.md](docs/UPGRADE-v2.md).
 
 ### Building Your Own Theme
 Want to replace the default look, or port an existing website into Vanilla Gorilla? See [docs/THEMING.md](docs/THEMING.md) for a full guide to the template/skeleton system and a step-by-step conversion walkthrough. We have included a SKILL called design-apply that you can reference directly or by inference to allow the agent(s) to accomplish this task for you.
