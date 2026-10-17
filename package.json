@@ -2,6 +2,7 @@
   "name": "vanilla-gorilla",
   "version": "1.0.0",
   "description": "A static site compiler that does the heavy lifting using vanilla JS, HTML, and agentic AI.",
+  "license": "AGPL-3.0-or-later",
   "main": "build.js",
   "type": "module",
   "scripts": {
@@ -17,5 +18,8 @@
     "chokidar": "^3.6.0",
     "gray-matter": "^4.0.3",
     "marked": "^18.0.5"
+  },
+  "vanillaGorilla": {
+    "templateVersion": 2
   }
 }
