@@ -143,6 +143,11 @@ function parseFrontmatterDate(value) {
     return null;
 }
 
+// A Markdown page with "draft: true" in its front matter is not published.
+function isDraft(frontmatter) {
+    return frontmatter.draft === true || String(frontmatter.draft).toLowerCase() === 'true';
+}
+
 function truncateText(text, max = 200) {
     const clean = text.replace(/\s+/g, ' ').trim();
     if (clean.length <= max) return clean;
@@ -256,6 +261,14 @@ async function compileMarkdownFile(filePath) {
 
     const raw = await fs.readFile(filePath, 'utf8');
     const { data: frontmatter, content: markdownBody } = matter(raw);
+
+    if (isDraft(frontmatter)) {
+        console.log(`Skipping draft: ${relativePath}`);
+        blogPosts.delete(blogSlugFor(relativePath));
+        galleries.delete(gallerySlugFor(relativePath));
+        await fs.rm(destPath, { force: true });
+        return;
+    }
 
     if (!frontmatter.title) {
         console.warn(`Warning: Skipping ${relativePath}: frontmatter is missing required "title" field.`);
@@ -618,7 +631,7 @@ async function collectAllMetadata(dir = SRC_DIR) {
                 } else if (entry.name.endsWith('.md')) {
                     const raw = await fs.readFile(fullPath, 'utf8');
                     const { data: frontmatter, content: markdownBody } = matter(raw);
-                    if (frontmatter.title) {
+                    if (frontmatter.title && !isDraft(frontmatter)) {
                         const date = parseFrontmatterDate(frontmatter.date);
                         const description = frontmatter.description
                             || truncateText(cheerio.load(marked.parse(markdownBody))('p').first().text());
@@ -632,7 +645,7 @@ async function collectAllMetadata(dir = SRC_DIR) {
                 } else if (entry.name.endsWith('.md')) {
                     const raw = await fs.readFile(fullPath, 'utf8');
                     const { data: frontmatter, content: markdownBody } = matter(raw);
-                    if (frontmatter.title) {
+                    if (frontmatter.title && !isDraft(frontmatter)) {
                         const date = parseFrontmatterDate(frontmatter.date);
                         const description = frontmatter.description
                             || truncateText(cheerio.load(marked.parse(markdownBody))('p').first().text());
