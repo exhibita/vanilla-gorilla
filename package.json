@@ -9,7 +9,8 @@
     "watch": "node minify.js && node build.js --watch",
     "create-page": "node create-page.js",
     "create-md": "node create-page.js --md",
-    "invalidate": "node invalidate.js"
+    "invalidate": "node invalidate.js",
+    "test": "node --test test/*.test.js"
   },
   "dependencies": {
     "cheerio": "^1.0.0-rc.12",
