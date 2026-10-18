@@ -170,3 +170,8 @@ test('an empty images: key is an empty list, with no warning', () => {
     assert.equal($('#gallery .gallery-item').length, 0);
     assert.match($('.entry-content').text(), /Photos come later\./);
 });
+
+test('each images: warning prints once per build', () => {
+    assert.equal((site.output.match(/beach-trip.*images\[2\] has no "path"/g) || []).length, 1);
+    assert.equal((site.output.match(/bad-list.*"images" must be a list/g) || []).length, 1);
+});

@@ -420,18 +420,21 @@ function relativeImagePath(imagePath) {
 }
 
 // Read the "images:" front matter list. Return the usable entries as { src, alt, caption }.
-function galleryImages(frontmatter, relativePath) {
+// quiet skips the warnings (the metadata pre-pass reads files that compile warns about).
+function galleryImages(frontmatter, relativePath, { quiet = false } = {}) {
+    const warn = message => { if (!quiet) console.warn(message); };
+
     // undefined: no images key. null: an empty "images:" key, for example a new gallery with no photos yet.
     if (frontmatter.images == null) return [];
     if (!Array.isArray(frontmatter.images)) {
-        console.warn(`Warning: ${relativePath}: "images" must be a list; ignoring it.`);
+        warn(`Warning: ${relativePath}: "images" must be a list; ignoring it.`);
         return [];
     }
 
     const images = [];
     frontmatter.images.forEach((image, i) => {
         if (!image || typeof image.path !== 'string' || !image.path.trim()) {
-            console.warn(`Warning: ${relativePath}: images[${i}] has no "path"; skipping it.`);
+            warn(`Warning: ${relativePath}: images[${i}] has no "path"; skipping it.`);
             return;
         }
         images.push({
@@ -746,7 +749,7 @@ async function collectAllMetadata(dir = SRC_DIR) {
                         const description = frontmatter.description
                             || truncateText(cheerio.load(marked.parse(markdownBody))('p').first().text());
                         const cover = frontmatter.cover
-                            || galleryImages(frontmatter, relativePath)[0]?.src
+                            || galleryImages(frontmatter, relativePath, { quiet: true })[0]?.src
                             || cheerio.load(marked.parse(markdownBody))('img').first().attr('src') || '';
                         galleries.set(gallerySlug, { slug: gallerySlug, title: frontmatter.title, date, description, cover });
                     }
