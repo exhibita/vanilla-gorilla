@@ -51,6 +51,16 @@ images: just-a-string
 Text.
 `;
 
+const nullImages = `---
+title: Null Images
+date: 2026-01-15
+skeleton: gallery
+images:
+---
+
+Photos come later.
+`;
+
 let site;
 const load = relativePath => cheerio.load(site.read(relativePath));
 
@@ -59,7 +69,8 @@ before(() => {
         'gallery/beach-trip/index.md': beachTrip,
         'gallery/one-photo/index.md': onePhoto,
         'gallery/empty-gallery/index.md': emptyGallery,
-        'gallery/bad-list/index.md': badList
+        'gallery/bad-list/index.md': badList,
+        'gallery/null-images/index.md': nullImages
     });
 });
 
@@ -151,4 +162,11 @@ test('the gallery index uses the first image as the cover', () => {
 test('a gallery with no images gets the default cover on the index', () => {
     const $ = load('gallery/index.html');
     assert.equal($('a[href="empty-gallery/"] img').attr('src'), '../images/gallery/sage-horizon.png');
+});
+
+test('an empty images: key is an empty list, with no warning', () => {
+    assert.doesNotMatch(site.output, /null-images.*"images" must be a list/);
+    const $ = load('gallery/null-images/index.html');
+    assert.equal($('#gallery .gallery-item').length, 0);
+    assert.match($('.entry-content').text(), /Photos come later\./);
 });

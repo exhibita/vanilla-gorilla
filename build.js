@@ -421,7 +421,8 @@ function relativeImagePath(imagePath) {
 
 // Read the "images:" front matter list. Return the usable entries as { src, alt, caption }.
 function galleryImages(frontmatter, relativePath) {
-    if (frontmatter.images === undefined) return [];
+    // undefined: no images key. null: an empty "images:" key, for example a new gallery with no photos yet.
+    if (frontmatter.images == null) return [];
     if (!Array.isArray(frontmatter.images)) {
         console.warn(`Warning: ${relativePath}: "images" must be a list; ignoring it.`);
         return [];
