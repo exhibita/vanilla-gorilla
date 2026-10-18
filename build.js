@@ -317,6 +317,9 @@ async function compileMarkdownFile(filePath) {
     $('title').text(`${frontmatter.title} - ${SITE_TITLE}`);
     $('.entry-title').text(frontmatter.title);
     if ($('#gallery').length) {
+        if (!$('#gallery-lightboxes').length) {
+            console.warn(`Warning: ${relativePath}: skeleton "${skeletonName}" has #gallery but no #gallery-lightboxes; the lightbox will not work. See docs/UPGRADE-v2.md.`);
+        }
         renderGallery($, images);
     }
     $('.entry-content').html(bodyHtml);
