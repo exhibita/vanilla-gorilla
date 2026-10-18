@@ -61,6 +61,16 @@ images:
 Photos come later.
 `;
 
+const quotes = `---
+title: Quotes
+date: 2025-12-01
+skeleton: gallery
+images:
+  - path: './images/gallery/quotes/a"b.jpg'
+    alt: 'The "best" view'
+---
+`;
+
 let site;
 const load = relativePath => cheerio.load(site.read(relativePath));
 
@@ -70,7 +80,8 @@ before(() => {
         'gallery/one-photo/index.md': onePhoto,
         'gallery/empty-gallery/index.md': emptyGallery,
         'gallery/bad-list/index.md': badList,
-        'gallery/null-images/index.md': nullImages
+        'gallery/null-images/index.md': nullImages,
+        'gallery/quotes/index.md': quotes
     });
 });
 
@@ -174,4 +185,15 @@ test('an empty images: key is an empty list, with no warning', () => {
 test('each images: warning prints once per build', () => {
     assert.equal((site.output.match(/beach-trip.*images\[2\] has no "path"/g) || []).length, 1);
     assert.equal((site.output.match(/bad-list.*"images" must be a list/g) || []).length, 1);
+});
+
+test('alt text with a double quote is shown as typed', () => {
+    const $ = load('gallery/quotes/index.html');
+    assert.equal($('#gallery img').attr('alt'), 'The "best" view');
+    assert.equal($('#img1 img').attr('alt'), 'The "best" view');
+});
+
+test('a cover path with a double quote is escaped on the gallery index', () => {
+    const $ = load('gallery/index.html');
+    assert.equal($('a[href="quotes/"] img').attr('src'), '../images/gallery/quotes/a"b.jpg');
 });

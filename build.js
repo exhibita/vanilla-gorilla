@@ -959,7 +959,7 @@ async function generateGalleryIndex() {
             const coverSrc = gallery.cover || './images/gallery/sage-horizon.png';
             return `        <div class="gallery-item">
             <a href="${hrefPrefix}${encodeURI(gallery.slug)}/">
-                <img src="${coverSrc}" alt="${escapeHtml(gallery.title)}">
+                <img src="${escapeHtml(coverSrc)}" alt="${escapeHtml(gallery.title)}">
                 <div class="gallery-caption">
                     <strong>${escapeHtml(gallery.title)}</strong>
                     ${descriptionHtml}
