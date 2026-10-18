@@ -143,6 +143,21 @@ function parseFrontmatterDate(value) {
     return null;
 }
 
+// Parse a Markdown file's front matter. Return null when the YAML is not valid, so one bad page
+// cannot stop the whole build. quiet skips the warning (the metadata pre-pass reads files that compile warns about).
+function readFrontmatter(raw, relativePath, { quiet = false } = {}) {
+    try {
+        return matter(raw);
+    } catch (err) {
+        // gray-matter caches a file before it parses it, so a later read would return empty data instead of failing.
+        matter.clearCache();
+        if (!quiet) {
+            console.warn(`Warning: Skipping ${relativePath}: front matter is not valid YAML (${err.message.split('\n')[0]}).`);
+        }
+        return null;
+    }
+}
+
 // A Markdown page with "draft: true" in its front matter is not published.
 function isDraft(frontmatter) {
     return frontmatter.draft === true || String(frontmatter.draft).toLowerCase() === 'true';
@@ -260,7 +275,14 @@ async function compileMarkdownFile(filePath) {
     console.log(`Compiling Markdown: ${relativePath}`);
 
     const raw = await fs.readFile(filePath, 'utf8');
-    const { data: frontmatter, content: markdownBody } = matter(raw);
+    const parsed = readFrontmatter(raw, relativePath);
+    if (!parsed) {
+        blogPosts.delete(blogSlugFor(relativePath));
+        galleries.delete(gallerySlugFor(relativePath));
+        await fs.rm(destPath, { force: true });
+        return;
+    }
+    const { data: frontmatter, content: markdownBody } = parsed;
 
     if (isDraft(frontmatter)) {
         console.log(`Skipping draft: ${relativePath}`);
@@ -699,7 +721,9 @@ async function collectAllMetadata(dir = SRC_DIR) {
                     collectHtmlPostMetadata(slug, content);
                 } else if (entry.name.endsWith('.md')) {
                     const raw = await fs.readFile(fullPath, 'utf8');
-                    const { data: frontmatter, content: markdownBody } = matter(raw);
+                    const parsed = readFrontmatter(raw, relativePath, { quiet: true });
+                    if (!parsed) continue;
+                    const { data: frontmatter, content: markdownBody } = parsed;
                     if (frontmatter.title && !isDraft(frontmatter)) {
                         const date = parseFrontmatterDate(frontmatter.date);
                         const description = frontmatter.description
@@ -713,7 +737,9 @@ async function collectAllMetadata(dir = SRC_DIR) {
                     collectHtmlGalleryMetadata(gallerySlug, content);
                 } else if (entry.name.endsWith('.md')) {
                     const raw = await fs.readFile(fullPath, 'utf8');
-                    const { data: frontmatter, content: markdownBody } = matter(raw);
+                    const parsed = readFrontmatter(raw, relativePath, { quiet: true });
+                    if (!parsed) continue;
+                    const { data: frontmatter, content: markdownBody } = parsed;
                     if (frontmatter.title && !isDraft(frontmatter)) {
                         const date = parseFrontmatterDate(frontmatter.date);
                         const description = frontmatter.description
