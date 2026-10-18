@@ -51,6 +51,26 @@ images: just-a-string
 Text.
 `;
 
+const nullImages = `---
+title: Null Images
+date: 2026-01-15
+skeleton: gallery
+images:
+---
+
+Photos come later.
+`;
+
+const quotes = `---
+title: Quotes
+date: 2025-12-01
+skeleton: gallery
+images:
+  - path: './images/gallery/quotes/a"b.jpg'
+    alt: 'The "best" view'
+---
+`;
+
 let site;
 const load = relativePath => cheerio.load(site.read(relativePath));
 
@@ -59,7 +79,9 @@ before(() => {
         'gallery/beach-trip/index.md': beachTrip,
         'gallery/one-photo/index.md': onePhoto,
         'gallery/empty-gallery/index.md': emptyGallery,
-        'gallery/bad-list/index.md': badList
+        'gallery/bad-list/index.md': badList,
+        'gallery/null-images/index.md': nullImages,
+        'gallery/quotes/index.md': quotes
     });
 });
 
@@ -151,4 +173,27 @@ test('the gallery index uses the first image as the cover', () => {
 test('a gallery with no images gets the default cover on the index', () => {
     const $ = load('gallery/index.html');
     assert.equal($('a[href="empty-gallery/"] img').attr('src'), '../images/gallery/sage-horizon.png');
+});
+
+test('an empty images: key is an empty list, with no warning', () => {
+    assert.doesNotMatch(site.output, /null-images.*"images" must be a list/);
+    const $ = load('gallery/null-images/index.html');
+    assert.equal($('#gallery .gallery-item').length, 0);
+    assert.match($('.entry-content').text(), /Photos come later\./);
+});
+
+test('each images: warning prints once per build', () => {
+    assert.equal((site.output.match(/beach-trip.*images\[2\] has no "path"/g) || []).length, 1);
+    assert.equal((site.output.match(/bad-list.*"images" must be a list/g) || []).length, 1);
+});
+
+test('alt text with a double quote is shown as typed', () => {
+    const $ = load('gallery/quotes/index.html');
+    assert.equal($('#gallery img').attr('alt'), 'The "best" view');
+    assert.equal($('#img1 img').attr('alt'), 'The "best" view');
+});
+
+test('a cover path with a double quote is escaped on the gallery index', () => {
+    const $ = load('gallery/index.html');
+    assert.equal($('a[href="quotes/"] img').attr('src'), '../images/gallery/quotes/a"b.jpg');
 });

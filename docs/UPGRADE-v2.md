@@ -13,6 +13,8 @@ Template version 2 adds drafts and galleries from a list of images. Gorilla To G
 
 Hand-built HTML pages and HTML galleries do not change.
 
+If the front matter of a Markdown page is not valid YAML, the build skips that page and shows a warning. The other pages build and deploy. (Before version 2.1 of `build.js`, one bad page stopped the whole build.)
+
 ## Upgrade a site
 
 1. Make a new branch in the site repository.

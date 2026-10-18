@@ -143,6 +143,21 @@ function parseFrontmatterDate(value) {
     return null;
 }
 
+// Parse a Markdown file's front matter. Return null when the YAML is not valid, so one bad page
+// cannot stop the whole build. quiet skips the warning (the metadata pre-pass reads files that compile warns about).
+function readFrontmatter(raw, relativePath, { quiet = false } = {}) {
+    try {
+        return matter(raw);
+    } catch (err) {
+        // gray-matter caches a file before it parses it, so a later read would return empty data instead of failing.
+        matter.clearCache();
+        if (!quiet) {
+            console.warn(`Warning: Skipping ${relativePath}: front matter is not valid YAML (${err.message.split('\n')[0]}).`);
+        }
+        return null;
+    }
+}
+
 // A Markdown page with "draft: true" in its front matter is not published.
 function isDraft(frontmatter) {
     return frontmatter.draft === true || String(frontmatter.draft).toLowerCase() === 'true';
@@ -260,7 +275,14 @@ async function compileMarkdownFile(filePath) {
     console.log(`Compiling Markdown: ${relativePath}`);
 
     const raw = await fs.readFile(filePath, 'utf8');
-    const { data: frontmatter, content: markdownBody } = matter(raw);
+    const parsed = readFrontmatter(raw, relativePath);
+    if (!parsed) {
+        blogPosts.delete(blogSlugFor(relativePath));
+        galleries.delete(gallerySlugFor(relativePath));
+        await fs.rm(destPath, { force: true });
+        return;
+    }
+    const { data: frontmatter, content: markdownBody } = parsed;
 
     if (isDraft(frontmatter)) {
         console.log(`Skipping draft: ${relativePath}`);
@@ -295,6 +317,9 @@ async function compileMarkdownFile(filePath) {
     $('title').text(`${frontmatter.title} - ${SITE_TITLE}`);
     $('.entry-title').text(frontmatter.title);
     if ($('#gallery').length) {
+        if (!$('#gallery-lightboxes').length) {
+            console.warn(`Warning: ${relativePath}: skeleton "${skeletonName}" has #gallery but no #gallery-lightboxes; the lightbox will not work. See docs/UPGRADE-v2.md.`);
+        }
         renderGallery($, images);
     }
     $('.entry-content').html(bodyHtml);
@@ -398,17 +423,21 @@ function relativeImagePath(imagePath) {
 }
 
 // Read the "images:" front matter list. Return the usable entries as { src, alt, caption }.
-function galleryImages(frontmatter, relativePath) {
-    if (frontmatter.images === undefined) return [];
+// quiet skips the warnings (the metadata pre-pass reads files that compile warns about).
+function galleryImages(frontmatter, relativePath, { quiet = false } = {}) {
+    const warn = message => { if (!quiet) console.warn(message); };
+
+    // undefined: no images key. null: an empty "images:" key, for example a new gallery with no photos yet.
+    if (frontmatter.images == null) return [];
     if (!Array.isArray(frontmatter.images)) {
-        console.warn(`Warning: ${relativePath}: "images" must be a list; ignoring it.`);
+        warn(`Warning: ${relativePath}: "images" must be a list; ignoring it.`);
         return [];
     }
 
     const images = [];
     frontmatter.images.forEach((image, i) => {
         if (!image || typeof image.path !== 'string' || !image.path.trim()) {
-            console.warn(`Warning: ${relativePath}: images[${i}] has no "path"; skipping it.`);
+            warn(`Warning: ${relativePath}: images[${i}] has no "path"; skipping it.`);
             return;
         }
         images.push({
@@ -699,7 +728,9 @@ async function collectAllMetadata(dir = SRC_DIR) {
                     collectHtmlPostMetadata(slug, content);
                 } else if (entry.name.endsWith('.md')) {
                     const raw = await fs.readFile(fullPath, 'utf8');
-                    const { data: frontmatter, content: markdownBody } = matter(raw);
+                    const parsed = readFrontmatter(raw, relativePath, { quiet: true });
+                    if (!parsed) continue;
+                    const { data: frontmatter, content: markdownBody } = parsed;
                     if (frontmatter.title && !isDraft(frontmatter)) {
                         const date = parseFrontmatterDate(frontmatter.date);
                         const description = frontmatter.description
@@ -713,13 +744,15 @@ async function collectAllMetadata(dir = SRC_DIR) {
                     collectHtmlGalleryMetadata(gallerySlug, content);
                 } else if (entry.name.endsWith('.md')) {
                     const raw = await fs.readFile(fullPath, 'utf8');
-                    const { data: frontmatter, content: markdownBody } = matter(raw);
+                    const parsed = readFrontmatter(raw, relativePath, { quiet: true });
+                    if (!parsed) continue;
+                    const { data: frontmatter, content: markdownBody } = parsed;
                     if (frontmatter.title && !isDraft(frontmatter)) {
                         const date = parseFrontmatterDate(frontmatter.date);
                         const description = frontmatter.description
                             || truncateText(cheerio.load(marked.parse(markdownBody))('p').first().text());
                         const cover = frontmatter.cover
-                            || galleryImages(frontmatter, relativePath)[0]?.src
+                            || galleryImages(frontmatter, relativePath, { quiet: true })[0]?.src
                             || cheerio.load(marked.parse(markdownBody))('img').first().attr('src') || '';
                         galleries.set(gallerySlug, { slug: gallerySlug, title: frontmatter.title, date, description, cover });
                     }
@@ -926,7 +959,7 @@ async function generateGalleryIndex() {
             const coverSrc = gallery.cover || './images/gallery/sage-horizon.png';
             return `        <div class="gallery-item">
             <a href="${hrefPrefix}${encodeURI(gallery.slug)}/">
-                <img src="${coverSrc}" alt="${escapeHtml(gallery.title)}">
+                <img src="${escapeHtml(coverSrc)}" alt="${escapeHtml(gallery.title)}">
                 <div class="gallery-caption">
                     <strong>${escapeHtml(gallery.title)}</strong>
                     ${descriptionHtml}
