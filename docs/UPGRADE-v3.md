@@ -20,7 +20,7 @@ Existing pages do not change. A site with no links page builds the same as befor
 ## Upgrade a site
 
 1. Make a new branch in the site repository.
-2. Copy `build.js` from the template into the site.
+2. **Compare Copy `build.js` from the template into the site.
 3. Copy `create-page.js` from the template into the site.
 4. Copy `src/skeletons/links-skeleton.html` from the template into the site.
 5. Add the CSS block from "Add the CSS" below to `src/css/style.css`.
@@ -182,3 +182,40 @@ The skeleton is a full HTML document. It does not include `header.html` and `foo
 Remove the hard-coded links from the file.
 
 For the classes and the theming options, see [THEMING.md](./THEMING.md#4-theming-a-links-page).
+
+## Suggested Prompt for AI assisted upgrade:
+
+If your site has already been upgraded to v2 template, you can try the following prompt to let your favorite AI agent perform your upgrade to Template version 3:
+
+>Upgrade this site to Vanilla Gorilla template 3.
+>
+>Sources
+>- Template repo: ../vanilla-gorilla. Read docs/UPGRADE-v3.md. Use `git log` there to find the v3 commits.
+>- Site: this repo. Read CLAUDE.md first.
+>
+>Method
+>1. Compare the site's build.js, create-page.js, skeletons and style.css with the template's previous version. Ignore line endings.
+>2. If a file is customized, do not replace it. Take the template's v3 diff and apply it as a patch.
+>3. If a file is not customized, copy it from the template.
+>4. The site's CSS uses its own variable names. Map the template's links CSS to the site's tokens.
+
+>Decisions already made
+>- Branch: create a new branch to work on for this work.
+>- Add the sample `src/links/index.md` with `draft: true`, using the site's real logo and social, phone and email links.
+>- Design: use the site's brand colors, fonts and logo.
+>- Sitemap: `sitemap: false` is the default.
+>- Add `test/links.test.js`. Update `template.test.js` to expect version 3.
+>- Add or Update CLAUDE.md as part of this job.
+>
+>Verify before you commit
+>- `npm run build` passes on a clean `dist/`. If a local server holds `dist/`, stop it first.
+>- `npm test` passes.
+>- Build `main` and this branch in a worktree and diff the `dist/` folders. Only CSS may differ.
+>- With the draft flag off, check the links page in a browser at phone width. Restore the draft flag afterward.
+>
+>Deliver
+>- Commit with conventional messages and the co-author trailer.
+>- Push the branch and open a PR. Do not push to `main`.
+>- In the PR body, list what you verified and what I should check locally.
+>
+>Ask me only if you find something these instructions don't cover.
