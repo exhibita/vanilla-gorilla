@@ -113,7 +113,7 @@ The stylesheet `src/css/style.css` provides a simple, light-background organic s
 ### CSS-Only Lightshow Lightbox
 The gallery skeleton (`src/skeletons/gallery-skeleton.html`) features a pure-CSS interactive Lightshow lightbox. List the images in the `images:` front matter of a gallery page, and `build.js` generates the grid and the lightbox. By targeting elements via the CSS `:target` selector, clicking an image triggers a modal overlay without using a single line of client-side JavaScript. This preserves lightning-fast load times.
 
-This is template version 2 (`"vanillaGorilla": { "templateVersion": 2 }` in `package.json`). To upgrade an older site, see [docs/UPGRADE-v2.md](docs/UPGRADE-v2.md).
+This is template version 3 (`"vanillaGorilla": { "templateVersion": 3 }` in `package.json`). To upgrade an older site, see [docs/UPGRADE-v3.md](docs/UPGRADE-v3.md) (links pages) and [docs/UPGRADE-v2.md](docs/UPGRADE-v2.md) (drafts and galleries).
 
 ### Building Your Own Theme
 Want to replace the default look, or port an existing website into Vanilla Gorilla? See [docs/THEMING.md](docs/THEMING.md) for a full guide to the template/skeleton system and a step-by-step conversion walkthrough. We have included a SKILL called design-apply that you can reference directly or by inference to allow the agent(s) to accomplish this task for you.

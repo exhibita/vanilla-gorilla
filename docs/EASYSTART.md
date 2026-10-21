@@ -99,6 +99,16 @@ We have included a [THEMING document](./THEMING.md) in the /docs folder that exp
 
 The simplest way to apply your design is the leverage the `design-apply` skill that we've made available to the Agent assisting you. You can call it directly or by inference and it will walk you through the process of the conversion and allows for iterative corrections once the first pass has been approved. Design source input can come from a local sketch, from a local static web page, from a live URL, or from Figma sketch ID or URL.
 
+### Adding a links page
+
+A links page is a simple page of link buttons, like the "link in bio" pages that social media profiles use. It has no site menu, header or footer. To make one, run this command from your SITENAME folder:
+
+`npm run create-md -- links links`
+
+This creates `src/links/index.md` with two sample links. Open the file and replace the sample links with your own. Each link needs a `url` (a full web address that starts with `https://` or similar) and the `text` for the button. You can also add a picture, a short text above the buttons, and CSS for this page only. The [README](../README.md) lists all the options. The [THEMING document](./THEMING.md#4-theming-a-links-page) explains how to change the look.
+
+Run `npm run build` and open `dist/links/index.html` in a browser to see the page. To make a links page that does not use the `/links/` address, give the command a different path, for example `npm run create-md -- links social/links`.
+
 ### Testing your design changes locally
 
 To test your design changes locally, you can either work with the agent to allow for iterative changes that, when displayed, can be approved or redirected as appropriate.
