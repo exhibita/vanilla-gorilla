@@ -104,13 +104,17 @@ async function main() {
     text: Vanilla Gorilla sample site
 ` : '';
 
+        const bodyLine = skeletonType === 'links'
+            ? 'Write the text that shows above your links here. Delete this line if you do not want text.'
+            : 'Write your post content here in Markdown...';
+
         const stub = `---
 title: ${titleFromSlug(slug)}
 date: ${today}
 description: Write a brief description here.
 ${skeletonLine}${linksLines}---
 
-Write your post content here in Markdown...
+${bodyLine}
 `;
 
         console.log(`Creating new Markdown page (skeleton "${skeletonType}" applied at build time)...`);

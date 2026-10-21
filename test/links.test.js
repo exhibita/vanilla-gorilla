@@ -38,6 +38,16 @@ links:
   - just-a-string
   - url: https://example.com/last
     text: Last Link
+  - url: file:///etc/passwd
+    text: File link
+  - url: blob:https://example.com/1234
+    text: Blob link
+  - url: view-source:https://example.com
+    text: View-source link
+  - url: ftp://example.com/file.txt
+    text: FTP link
+  - url: sms:+15555550100
+    text: Text me
 ---
 
 Intro text before the links.
@@ -141,7 +151,7 @@ test('the page has no site header, nav or footer', () => {
 
 test('only the valid entries become link buttons, in order', () => {
     const texts = $('#links a.link-button').map((_, a) => $(a).text()).get();
-    assert.deepEqual(texts, ['Fish & <Chips>', 'Email me', 'Call me', 'Last Link']);
+    assert.deepEqual(texts, ['Fish & <Chips>', 'Email me', 'Call me', 'Last Link', 'Text me']);
 });
 
 test('each link button opens in a new tab with a safe rel', () => {
@@ -161,8 +171,13 @@ test('invalid entries give warnings', () => {
     assert.match(site.output, /links[\\/]index\.md: links\[3\] url "\.\/relative\/" is not a full URL/);
     assert.match(site.output, /links\[4\] url "\/absolute-path\/" is not a full URL/);
     assert.match(site.output, /links\[5\] url "\/\/example\.com\/protocol-relative" is not a full URL/);
-    assert.match(site.output, /links\[6\] url uses the blocked protocol "javascript:"/);
-    assert.match(site.output, /links\[7\] url uses the blocked protocol "data:"/);
+    assert.match(site.output, /links\[6\] url uses the protocol "javascript:", which is not allowed/);
+    assert.match(site.output, /links\[7\] url uses the protocol "data:", which is not allowed/);
+    assert.match(site.output, /links\[12\] url uses the protocol "file:", which is not allowed/);
+    assert.match(site.output, /links\[13\] url uses the protocol "blob:", which is not allowed/);
+    assert.match(site.output, /links\[14\] url uses the protocol "view-source:", which is not allowed/);
+    assert.match(site.output, /links\[15\] url uses the protocol "ftp:", which is not allowed/);
+    assert.doesNotMatch(site.output, /links\[16\]/);
     assert.match(site.output, /links\[8\] needs both "url" and "text"/);
     assert.match(site.output, /links\[9\] needs both "url" and "text"/);
     assert.match(site.output, /links\[10\] needs both "url" and "text"/);
@@ -253,7 +268,9 @@ test('create-md with the links skeleton writes two sample links', () => {
             '    text: Vanilla Gorilla on GitHub',
             '  - url: https://vg.exhibita.com',
             '    text: Vanilla Gorilla sample site',
-            '---'
+            '---',
+            '',
+            'Write the text that shows above your links here. Delete this line if you do not want text.'
         ].join('\n')), stub);
     } finally {
         fs.rmSync(dir, { recursive: true, force: true });
