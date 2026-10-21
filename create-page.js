@@ -97,11 +97,18 @@ async function main() {
         const today = new Date().toISOString().slice(0, 10);
         const skeletonLine = skeletonType === 'blog' ? '' : `skeleton: ${skeletonType}\n`;
 
+        const linksLines = skeletonType === 'links' ? `links:
+  - url: https://github.com/exhibita/vanilla-gorilla
+    text: Vanilla Gorilla on GitHub
+  - url: https://vg.exhibita.com
+    text: Vanilla Gorilla sample site
+` : '';
+
         const stub = `---
 title: ${titleFromSlug(slug)}
 date: ${today}
 description: Write a brief description here.
-${skeletonLine}---
+${skeletonLine}${linksLines}---
 
 Write your post content here in Markdown...
 `;

@@ -17,6 +17,7 @@ Use this skill when the user commands you to create a new page, blog post, or ar
     - **For HTML**: Run `npm run create-page -- <skeleton-type> <path>`
       *Example: `npm run create-page -- page my-custom-page`*
     - **For a gallery**: Run `npm run create-md -- gallery gallery/<slug>`, then add an `images:` list (`path`, `alt`, `caption` for each image) to the front matter. Put the images in `src/images/gallery/<slug>/`. See `docs/UPGRADE-v2.md`.
+    - **For a links page**: Run `npm run create-md -- links links` (or any path), then replace the two sample links in the `links:` list (`url`, `text` for each link). Add `image`, `image_alt`, `css` and `sitemap: true` (the default is false) to the front matter as needed. Each `url` must be a full URL with a protocol. See `README.md`.
 4.  **Generate Content**:
     - Open the newly generated file (e.g., `src/blog/my-new-post/index.md`).
     - Populate high-quality, professional, and SEO-friendly content based on the user's instructions.
