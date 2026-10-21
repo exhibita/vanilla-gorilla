@@ -8,7 +8,7 @@ import { ROOT, buildSite } from './build-site.js';
 const pkg = JSON.parse(fs.readFileSync(path.join(ROOT, 'package.json'), 'utf8'));
 
 test('package.json declares template version 2', () => {
-    assert.deepEqual(pkg.vanillaGorilla, { templateVersion: 2 });
+    assert.deepEqual(pkg.vanillaGorilla, { templateVersion: 3 });
 });
 
 test('package.json declares the AGPL-3.0-or-later license', () => {

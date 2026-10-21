@@ -20,6 +20,6 @@
     "marked": "^18.0.5"
   },
   "vanillaGorilla": {
-    "templateVersion": 2
+    "templateVersion": 3
   }
 }

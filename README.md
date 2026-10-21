@@ -51,6 +51,24 @@ To scaffold a new page or blog post with appropriate relative path nesting:
   ```bash
   npm run create-md -- gallery gallery/travel-photos
   ```
+- **Links page**: create a Markdown page with the `links` skeleton. It is a minimal page of link buttons with no site header, nav or footer. It is not listed in the nav, the blog, the feed or the gallery index. It is not in `sitemap.xml` unless you set `sitemap: true`.
+  ```bash
+  npm run create-md -- links links
+  ```
+  The new page has two sample links. Add these keys to the front matter. The Markdown body shows above the buttons.
+  ```yaml
+  skeleton: links
+  title: My Links               # the H1
+  image: ./images/me.png        # optional; a path or a URL
+  image_alt: A portrait         # optional
+  sitemap: true                 # optional; the default is false, so the page is not in sitemap.xml
+  css: |                        # optional; local CSS overrides for this page
+    .links-page { --color-primary: #c98263; }
+  links:
+    - url: https://example.com  # a full URL with a protocol; relative URLs are skipped
+      text: My Website
+  ```
+  Each link opens in a new tab. The build skips an entry that has no `text`, a relative URL, or a `javascript:`, `data:` or `vbscript:` URL, and prints a warning.
 - **Draft**: add `draft: true` to the front matter of a Markdown page. The build does not publish it.
 
 ---
@@ -70,6 +88,7 @@ To scaffold a new page or blog post with appropriate relative path nesting:
 │   ├── templates/              # Reusable template components (header.html, footer.html)
 │   ├── blog/                   # Blog articles and generated blog listing
 │   ├── gallery/                # Image gallery with built-in Lightshow Lightbox
+│   ├── links/                  # Sample links page (skeleton: links)
 │   └── index.html              # Homepage template
 ├── dist/                       # Compiled static production-ready output (Git-ignored)
 ├── build.js                    # Compiler execution script
@@ -94,7 +113,7 @@ The stylesheet `src/css/style.css` provides a simple, light-background organic s
 ### CSS-Only Lightshow Lightbox
 The gallery skeleton (`src/skeletons/gallery-skeleton.html`) features a pure-CSS interactive Lightshow lightbox. List the images in the `images:` front matter of a gallery page, and `build.js` generates the grid and the lightbox. By targeting elements via the CSS `:target` selector, clicking an image triggers a modal overlay without using a single line of client-side JavaScript. This preserves lightning-fast load times.
 
-This is template version 2 (`"vanillaGorilla": { "templateVersion": 2 }` in `package.json`). To upgrade an older site, see [docs/UPGRADE-v2.md](docs/UPGRADE-v2.md).
+This is template version 3 (`"vanillaGorilla": { "templateVersion": 3 }` in `package.json`). To upgrade an older site, see [docs/UPGRADE-v3.md](docs/UPGRADE-v3.md) (links pages) and [docs/UPGRADE-v2.md](docs/UPGRADE-v2.md) (drafts and galleries).
 
 ### Building Your Own Theme
 Want to replace the default look, or port an existing website into Vanilla Gorilla? See [docs/THEMING.md](docs/THEMING.md) for a full guide to the template/skeleton system and a step-by-step conversion walkthrough. We have included a SKILL called design-apply that you can reference directly or by inference to allow the agent(s) to accomplish this task for you.

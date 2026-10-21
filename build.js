@@ -40,6 +40,9 @@ const blogPosts = new Map();
 // Registry of gallery metadata collected during compilation, keyed by slug.
 const galleries = new Map();
 
+// Compiled pages (paths relative to dist, with "/") that the sitemap leaves out.
+const sitemapExcluded = new Set();
+
 function gallerySlugFor(relativePath) {
     const parts = relativePath.split(/[\\/]/);
     if (parts.length !== 3 || parts[0] !== 'gallery') return null;
@@ -307,7 +310,16 @@ async function compileMarkdownFile(filePath) {
     const bodyHtml = marked.parse(markdownBody);
     const date = parseFrontmatterDate(frontmatter.date);
 
-    const slug = blogSlugFor(relativePath);
+    // A links page is never listed: it stays out of the blog and gallery registries, whatever its path.
+    const isLinksPage = skeletonName === 'links';
+    // A links page is in sitemap.xml only when its front matter has "sitemap: true".
+    const sitemapKey = htmlRelativePath.replace(/\\/g, '/');
+    if (isLinksPage && !(frontmatter.sitemap === true || String(frontmatter.sitemap).toLowerCase() === 'true')) {
+        sitemapExcluded.add(sitemapKey);
+    } else {
+        sitemapExcluded.delete(sitemapKey);
+    }
+    const slug = isLinksPage ? null : blogSlugFor(relativePath);
     const images = galleryImages(frontmatter, relativePath);
 
     const skeletonContent = await fs.readFile(skeletonPath, 'utf8');
@@ -321,6 +333,9 @@ async function compileMarkdownFile(filePath) {
             console.warn(`Warning: ${relativePath}: skeleton "${skeletonName}" has #gallery but no #gallery-lightboxes; the lightbox will not work. See docs/UPGRADE-v2.md.`);
         }
         renderGallery($, images);
+    }
+    if ($('#links').length) {
+        renderLinks($, frontmatter, relativePath);
     }
     $('.entry-content').html(bodyHtml);
 
@@ -357,7 +372,7 @@ async function compileMarkdownFile(filePath) {
         blogPosts.set(slug, { slug, title: frontmatter.title, date, description });
     }
 
-    const gallerySlug = gallerySlugFor(relativePath);
+    const gallerySlug = isLinksPage ? null : gallerySlugFor(relativePath);
     if (gallerySlug) {
         const description = frontmatter.description
             || truncateText(cheerio.load(bodyHtml)('p').first().text());
@@ -483,6 +498,69 @@ function renderGallery($, images) {
 
     $('#gallery').html(`\n${items}\n`);
     $('#gallery-lightboxes').html(`\n${lightboxes}\n`);
+}
+
+// Link protocols that run code in the page. A links page never accepts them.
+const BLOCKED_LINK_PROTOCOLS = new Set(['javascript:', 'data:', 'vbscript:']);
+
+// Read the "links:" front matter list. Return the usable entries as { href, text }.
+// An entry needs a "text" and a full URL with a protocol. A relative URL is not valid.
+function linkItems(frontmatter, relativePath) {
+    if (frontmatter.links == null) return [];
+    if (!Array.isArray(frontmatter.links)) {
+        console.warn(`Warning: ${relativePath}: "links" must be a list; ignoring it.`);
+        return [];
+    }
+
+    const links = [];
+    frontmatter.links.forEach((link, i) => {
+        const href = typeof link?.url === 'string' ? link.url.trim() : '';
+        const text = link?.text == null ? '' : String(link.text).trim();
+        if (!href || !text) {
+            console.warn(`Warning: ${relativePath}: links[${i}] needs both "url" and "text"; skipping it.`);
+            return;
+        }
+
+        let protocol;
+        try {
+            protocol = new URL(href).protocol;
+        } catch {
+            console.warn(`Warning: ${relativePath}: links[${i}] url "${href}" is not a full URL with a protocol; skipping it.`);
+            return;
+        }
+        if (BLOCKED_LINK_PROTOCOLS.has(protocol)) {
+            console.warn(`Warning: ${relativePath}: links[${i}] url uses the blocked protocol "${protocol}"; skipping it.`);
+            return;
+        }
+        links.push({ href, text });
+    });
+    return links;
+}
+
+// Fill the links skeleton: the link buttons, the optional image, and the optional local CSS overrides.
+function renderLinks($, frontmatter, relativePath) {
+    const buttons = linkItems(frontmatter, relativePath).map(link =>
+        `    <a class="link-button" href="${escapeHtml(link.href)}" target="_blank" rel="noopener noreferrer">${escapeHtml(link.text)}</a>`
+    ).join('\n');
+    $('#links').html(`\n${buttons}\n`);
+
+    const image = typeof frontmatter.image === 'string' ? frontmatter.image.trim() : '';
+    if (frontmatter.image != null && !image) {
+        console.warn(`Warning: ${relativePath}: "image" must be a non-empty path or URL; ignoring it.`);
+    }
+    if (image) {
+        $('#links-image').attr('src', relativeImagePath(image)).attr('alt', String(frontmatter.image_alt ?? ''));
+    } else {
+        $('#links-image').remove();
+    }
+
+    if (frontmatter.css != null && typeof frontmatter.css !== 'string') {
+        console.warn(`Warning: ${relativePath}: "css" must be a string of CSS; ignoring it.`);
+    } else if (frontmatter.css?.trim()) {
+        // "<\/style" cannot close the style element, so the CSS cannot break out of it.
+        const css = frontmatter.css.replace(/<\/(style)/gi, '<\\/$1');
+        $('head').append(`<style id="links-overrides">\n${css}\n</style>\n`);
+    }
 }
 
 // Generate the blog index
@@ -674,6 +752,7 @@ async function generateSitemap() {
                 await walk(fullPath);
             } else if (entry.name.endsWith('.html')) {
                 let relPath = path.relative(DIST_DIR, fullPath).replace(/\\/g, '/');
+                if (sitemapExcluded.has(relPath)) continue;
                 if (relPath.endsWith('index.html')) {
                     relPath = relPath.slice(0, -10);
                 }
@@ -731,7 +810,7 @@ async function collectAllMetadata(dir = SRC_DIR) {
                     const parsed = readFrontmatter(raw, relativePath, { quiet: true });
                     if (!parsed) continue;
                     const { data: frontmatter, content: markdownBody } = parsed;
-                    if (frontmatter.title && !isDraft(frontmatter)) {
+                    if (frontmatter.title && !isDraft(frontmatter) && frontmatter.skeleton !== 'links') {
                         const date = parseFrontmatterDate(frontmatter.date);
                         const description = frontmatter.description
                             || truncateText(cheerio.load(marked.parse(markdownBody))('p').first().text());
@@ -747,7 +826,7 @@ async function collectAllMetadata(dir = SRC_DIR) {
                     const parsed = readFrontmatter(raw, relativePath, { quiet: true });
                     if (!parsed) continue;
                     const { data: frontmatter, content: markdownBody } = parsed;
-                    if (frontmatter.title && !isDraft(frontmatter)) {
+                    if (frontmatter.title && !isDraft(frontmatter) && frontmatter.skeleton !== 'links') {
                         const date = parseFrontmatterDate(frontmatter.date);
                         const description = frontmatter.description
                             || truncateText(cheerio.load(marked.parse(markdownBody))('p').first().text());
