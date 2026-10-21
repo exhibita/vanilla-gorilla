@@ -538,7 +538,7 @@ ul.wp-block-latest-posts a {
 
 .links-page main.links-container {
   width: 100%;
-  min-width: var(--links-min-width);
+  min-width: min(var(--links-min-width), 100%);
   max-width: var(--links-max-width);
   margin: 0 auto;
   padding: 2.5rem 1.5rem;

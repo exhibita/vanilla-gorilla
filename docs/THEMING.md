@@ -211,7 +211,7 @@ The "Links Page" block of `src/css/style.css` styles every links page. It uses t
 | `.link-button:hover` | The hover state. It uses `--color-primary-hover` and `--shadow-md`. |
 | `.link-button:focus-visible` | The keyboard focus ring. It uses `--color-accent`. Keep a visible focus style in a new theme. |
 
-The minimum width (`360px`) is set for the width of an average phone. Below that width the page scrolls sideways.
+The minimum width (`360px`) is set for the width of an average phone. On a narrower screen the column shrinks to the width of the screen, so the page does not scroll sideways.
 
 ### 2. The `css:` front matter of one page
 
@@ -245,6 +245,7 @@ links:
 - A relative `url(./images/...)` in `css:` is fixed for the depth of the page, like the other relative paths.
 - The build changes `</style` in the value so that the CSS cannot close the `<style>` block.
 - The value must be a string. Use `css: |` for more than one line.
+- The `css:` value is trusted content from the page author. It can use `@import` and `url()` to load files from other sites.
 
 ### 3. The image in the front matter
 
@@ -253,7 +254,7 @@ image: ./images/me.png
 image_alt: A portrait of me
 ```
 
-- `image` is a path from `src/` that starts with `./`, or a full URL. The build fixes a `./` path for the depth of the page.
+- `image` is a path from `src/` that starts with `./`, or a full URL. The build fixes a `./` path for the depth of the page. The build uses a root-relative path (`/images/me.png`) as written, so it does not work when the site is in a sub-path, for example on GitHub Pages.
 - `image_alt` is the alt text. The default is an empty alt, which is correct for a decorative image.
 - The image is centered above the title. Its maximum width is one third of `--links-min-width`. To change the size, set `--links-min-width` or `.links-page .links-image { max-width: ... }` in the page `css:`.
 - If the page has no `image`, the build removes the `<img>` element. The title moves to the top.

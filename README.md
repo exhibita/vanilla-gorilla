@@ -68,7 +68,7 @@ To scaffold a new page or blog post with appropriate relative path nesting:
     - url: https://example.com  # a full URL with a protocol; relative URLs are skipped
       text: My Website
   ```
-  Each link opens in a new tab. The build skips an entry that has no `text`, a relative URL, or a `javascript:`, `data:` or `vbscript:` URL, and prints a warning.
+  Each link opens in a new tab. A link can use `http:`, `https:`, `mailto:`, `tel:` or `sms:`. The build skips an entry that has no `text`, a relative URL, or a URL with another protocol, and prints a warning. The sample page `src/links/index.md` is a draft. Remove its `draft: true` line to publish it.
 - **Draft**: add `draft: true` to the front matter of a Markdown page. The build does not publish it.
 
 ---

@@ -51,7 +51,7 @@ If you changed `style.css`, add this block before the first `@media` rule. Do no
 
 .links-page main.links-container {
   width: 100%;
-  min-width: var(--links-min-width);
+  min-width: min(var(--links-min-width), 100%);
   max-width: var(--links-max-width);
   margin: 0 auto;
   padding: 2.5rem 1.5rem;
@@ -141,7 +141,7 @@ Text above the links.
 | `title` | Yes | The H1 and the document title. |
 | `skeleton` | Yes | Must be `links`. |
 | `links` | No | The list of link buttons. Each entry needs `url` and `text`. |
-| `image` | No | A picture above the title. Use a path from `src/` that starts with `./`, or a full URL. |
+| `image` | No | A picture above the title. Use a path from `src/` that starts with `./`, or a full URL. The build uses a root-relative path (`/images/me.png`) as written. It does not work when the site is in a sub-path, for example on GitHub Pages. |
 | `image_alt` | No | The alt text of the image. The default is an empty alt. |
 | `css` | No | CSS for this page only. It goes in a `<style>` block after the main stylesheet. |
 | `description` | No | The meta description. |
@@ -151,12 +151,14 @@ Text above the links.
 Rules for the `links` list:
 
 - Each link opens in a new tab (`target="_blank"` with `rel="noopener noreferrer"`).
-- `url` must be a full URL with a protocol, for example `https://`, `mailto:` or `tel:`. A relative URL, a root-relative URL (`/page/`) and a protocol-relative URL (`//example.com`) are not valid.
-- The build does not accept `javascript:`, `data:` and `vbscript:` URLs.
+- `url` must be a full URL with a protocol. A relative URL, a root-relative URL (`/page/`) and a protocol-relative URL (`//example.com`) are not valid.
+- The build accepts only these protocols: `http:`, `https:`, `mailto:`, `tel:` and `sms:`. To accept more, add them to `ALLOWED_LINK_PROTOCOLS` in `build.js`.
 - The build skips an entry that is not valid, and shows a warning. The other entries build.
 - The Markdown text after the front matter shows above the buttons.
 
 A links page is not in the blog index, the RSS feed or the gallery index. This is also true for a links page under `src/blog/` or `src/gallery/`. The page has no navigation, because the skeleton does not include `header.html` and `footer.html`.
+
+The template has a sample links page at `src/links/index.md`. It is a draft, so the build does not publish it. Remove the `draft: true` line to publish it, or delete the file.
 
 To create a links page with two sample links:
 

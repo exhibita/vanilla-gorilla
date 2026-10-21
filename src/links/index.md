@@ -2,6 +2,7 @@
 title: Vanilla Gorilla Links
 description: Find Vanilla Gorilla around the web.
 skeleton: links
+draft: true
 sitemap: false
 image: ./images/logo.png
 image_alt: Vanilla Gorilla logo

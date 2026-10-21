@@ -55,6 +55,7 @@ async function cleanDist() {
     console.log('Cleaning dist directory...');
     await fs.rm(DIST_DIR, { recursive: true, force: true });
     await fs.mkdir(DIST_DIR, { recursive: true });
+    sitemapExcluded.clear();
 }
 
 // Helper to get directory nesting depth relative to SRC_DIR
@@ -164,6 +165,11 @@ function readFrontmatter(raw, relativePath, { quiet = false } = {}) {
 // A Markdown page with "draft: true" in its front matter is not published.
 function isDraft(frontmatter) {
     return frontmatter.draft === true || String(frontmatter.draft).toLowerCase() === 'true';
+}
+
+// A Markdown page with "skeleton: links" is a links page. It is never listed.
+function isLinksPage(frontmatter) {
+    return frontmatter.skeleton === 'links';
 }
 
 function truncateText(text, max = 200) {
@@ -311,15 +317,15 @@ async function compileMarkdownFile(filePath) {
     const date = parseFrontmatterDate(frontmatter.date);
 
     // A links page is never listed: it stays out of the blog and gallery registries, whatever its path.
-    const isLinksPage = skeletonName === 'links';
+    const linksPage = isLinksPage(frontmatter);
     // A links page is in sitemap.xml only when its front matter has "sitemap: true".
     const sitemapKey = htmlRelativePath.replace(/\\/g, '/');
-    if (isLinksPage && !(frontmatter.sitemap === true || String(frontmatter.sitemap).toLowerCase() === 'true')) {
+    if (linksPage && !(frontmatter.sitemap === true || String(frontmatter.sitemap).toLowerCase() === 'true')) {
         sitemapExcluded.add(sitemapKey);
     } else {
         sitemapExcluded.delete(sitemapKey);
     }
-    const slug = isLinksPage ? null : blogSlugFor(relativePath);
+    const slug = linksPage ? null : blogSlugFor(relativePath);
     const images = galleryImages(frontmatter, relativePath);
 
     const skeletonContent = await fs.readFile(skeletonPath, 'utf8');
@@ -372,7 +378,7 @@ async function compileMarkdownFile(filePath) {
         blogPosts.set(slug, { slug, title: frontmatter.title, date, description });
     }
 
-    const gallerySlug = isLinksPage ? null : gallerySlugFor(relativePath);
+    const gallerySlug = linksPage ? null : gallerySlugFor(relativePath);
     if (gallerySlug) {
         const description = frontmatter.description
             || truncateText(cheerio.load(bodyHtml)('p').first().text());
@@ -500,8 +506,8 @@ function renderGallery($, images) {
     $('#gallery-lightboxes').html(`\n${lightboxes}\n`);
 }
 
-// Link protocols that run code in the page. A links page never accepts them.
-const BLOCKED_LINK_PROTOCOLS = new Set(['javascript:', 'data:', 'vbscript:']);
+// The only link protocols a links page accepts.
+const ALLOWED_LINK_PROTOCOLS = new Set(['http:', 'https:', 'mailto:', 'tel:', 'sms:']);
 
 // Read the "links:" front matter list. Return the usable entries as { href, text }.
 // An entry needs a "text" and a full URL with a protocol. A relative URL is not valid.
@@ -528,8 +534,8 @@ function linkItems(frontmatter, relativePath) {
             console.warn(`Warning: ${relativePath}: links[${i}] url "${href}" is not a full URL with a protocol; skipping it.`);
             return;
         }
-        if (BLOCKED_LINK_PROTOCOLS.has(protocol)) {
-            console.warn(`Warning: ${relativePath}: links[${i}] url uses the blocked protocol "${protocol}"; skipping it.`);
+        if (!ALLOWED_LINK_PROTOCOLS.has(protocol)) {
+            console.warn(`Warning: ${relativePath}: links[${i}] url uses the protocol "${protocol}", which is not allowed; skipping it.`);
             return;
         }
         links.push({ href, text });
@@ -810,7 +816,7 @@ async function collectAllMetadata(dir = SRC_DIR) {
                     const parsed = readFrontmatter(raw, relativePath, { quiet: true });
                     if (!parsed) continue;
                     const { data: frontmatter, content: markdownBody } = parsed;
-                    if (frontmatter.title && !isDraft(frontmatter) && frontmatter.skeleton !== 'links') {
+                    if (frontmatter.title && !isDraft(frontmatter) && !isLinksPage(frontmatter)) {
                         const date = parseFrontmatterDate(frontmatter.date);
                         const description = frontmatter.description
                             || truncateText(cheerio.load(marked.parse(markdownBody))('p').first().text());
@@ -826,7 +832,7 @@ async function collectAllMetadata(dir = SRC_DIR) {
                     const parsed = readFrontmatter(raw, relativePath, { quiet: true });
                     if (!parsed) continue;
                     const { data: frontmatter, content: markdownBody } = parsed;
-                    if (frontmatter.title && !isDraft(frontmatter) && frontmatter.skeleton !== 'links') {
+                    if (frontmatter.title && !isDraft(frontmatter) && !isLinksPage(frontmatter)) {
                         const date = parseFrontmatterDate(frontmatter.date);
                         const description = frontmatter.description
                             || truncateText(cheerio.load(marked.parse(markdownBody))('p').first().text());

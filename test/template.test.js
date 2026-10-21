@@ -7,7 +7,7 @@ import { ROOT, buildSite } from './build-site.js';
 
 const pkg = JSON.parse(fs.readFileSync(path.join(ROOT, 'package.json'), 'utf8'));
 
-test('package.json declares template version 2', () => {
+test('package.json declares template version 3', () => {
     assert.deepEqual(pkg.vanillaGorilla, { templateVersion: 3 });
 });
 
