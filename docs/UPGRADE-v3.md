@@ -190,7 +190,7 @@ If your site has already been upgraded to v2 template, you can try the following
 >Upgrade this site to Vanilla Gorilla template 3.
 >
 >Sources
->- Template repo: ../vanilla-gorilla. Read docs/UPGRADE-v3.md. Use `git log` there to find the v3 commits.
+>- Template repo: https://github.com/exhibita/vanilla-gorilla. Read docs/UPGRADE-v3.md. Use `git log` there to find the v3 commits.
 >- Site: this repo. Read CLAUDE.md first.
 >
 >Method
