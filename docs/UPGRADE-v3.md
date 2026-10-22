@@ -20,7 +20,7 @@ Existing pages do not change. A site with no links page builds the same as befor
 ## Upgrade a site
 
 1. Make a new branch in the site repository.
-2. **Compare Copy `build.js` from the template into the site.
+2. Copy `build.js` from the template into the site. If the site has its own changes in `build.js`, do not replace the file: compare it with the template and add the version 3 changes.
 3. Copy `create-page.js` from the template into the site.
 4. Copy `src/skeletons/links-skeleton.html` from the template into the site.
 5. Add the CSS block from "Add the CSS" below to `src/css/style.css`.
