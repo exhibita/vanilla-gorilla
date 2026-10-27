@@ -22,6 +22,8 @@ If you are looking for the easiest way to get started with Vanilla Gorilla Stati
 If you already have your computer set up for web development, you will most likely already have Node.JS, Git, and GitHub CLI installed and configured. If so, all you will need to do is run the following command from the folder that will be the parent of your SITENAME folder/directory where your project will run.
 `npx create-vanilla-gorilla SITENAME`
 
+The command asks for your site's address (URL), title and description, and writes them to `config.json`. The RSS feed and the sitemap use these values. If you made your site another way, open `config.json` and set `siteUrl`, `siteTitle` and `siteDescription` before your first deploy. Do not put secrets in `config.json`. It is committed to your repository.
+
 ### 1. Install Dependencies
 After running the above command, you'll be presented with your immediate next steps. 
 ![screenshot of the output from running npx create-vanilla-gorilla SITENAME](./src/images/create-vanilla-gorilla-screenshot.png)
@@ -92,6 +94,7 @@ To scaffold a new page or blog post with appropriate relative path nesting:
 │   └── index.html              # Homepage template
 ├── dist/                       # Compiled static production-ready output (Git-ignored)
 ├── build.js                    # Compiler execution script
+├── config.json                 # Site address, title and description (committed; no secrets)
 ├── minify.js                   # CSS compression script
 ├── create-page.js              # Page and article generator scaffolding tool
 ├── invalidate.js               # CDN cache purger for CloudFront invalidations

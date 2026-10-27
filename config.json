@@ -1,0 +1,6 @@
+{
+  "_comment": "WARNING: Do NOT put secrets (passwords, API keys, tokens, access keys) in this file. It is committed to the GitHub repository.",
+  "siteUrl": "https://exhibita.github.io/vanilla-gorilla",
+  "siteTitle": "Vanilla Gorilla",
+  "siteDescription": "Vanilla HTML/CSS/JS compiler with agentic superpowers."
+}

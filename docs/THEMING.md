@@ -179,7 +179,7 @@ Any link, `<img src>`, or CSS `url(...)` that used `./`-relative paths in the or
 
 ### Step 5 — Rebuild global bits
 
-- Update `siteUrl`, `siteTitle`, `siteDescription` — either via a `config.json` at the repo root (not committed by default) or `SITE_URL`/`SITE_TITLE`/`SITE_DESCRIPTION` environment variables (`build.js:16-33`). These feed the RSS feed, sitemap, and `<title>`/meta description defaults.
+- Update `siteUrl`, `siteTitle`, `siteDescription` in the committed `config.json` at the repo root. The `SITE_URL`/`SITE_TITLE`/`SITE_DESCRIPTION` environment variables override it (`build.js:16-45`). These feed the RSS feed, sitemap, and `<title>`/meta description defaults.
 - If the old site had RSS/sitemap already, you don't need to port them — `npm run build` regenerates `dist/rss.xml` (from blog posts with a `date` in front matter) and `dist/sitemap.xml` (walked from everything compiled to `dist/`) automatically.
 
 ### Step 6 — Verify
@@ -273,4 +273,4 @@ To change the markup, edit `links-skeleton.html`. Keep `.entry-title`, `.entry-c
 | `src/templates/*.html` | Global chrome partials, included via `<!--#include file="..." -->` |
 | `src/skeletons/*-skeleton.html` | Per-content-type shells merged with Markdown front matter + body |
 | `src/css/style.css` | Hand-authored theme styles (edit this, not the `.min.css`) |
-| `config.json` (optional, not committed) | Overrides `siteUrl`, `siteTitle`, `siteDescription`, `rssItemLimit`, `postsPerPage` |
+| `config.json` (committed; no secrets) | Overrides `siteUrl`, `siteTitle`, `siteDescription`, `rssItemLimit`, `postsPerPage` |

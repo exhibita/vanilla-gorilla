@@ -2,7 +2,7 @@ import { spawnSync } from 'child_process';
 import fs from 'fs';
 
 // CDN Cache Invalidation utility for Vanilla Gorilla.
-// To configure, set these variables or define them in a local config.json.
+// To configure, set these variables or define them in config.json.
 let DISTRIBUTION_ID = 'YOUR_CLOUDFRONT_DISTRIBUTION_ID'; 
 let DEFAULT_PROFILE = 'default';
 
@@ -50,7 +50,7 @@ if (targets.length === 0) usage();
 if (DISTRIBUTION_ID === 'YOUR_CLOUDFRONT_DISTRIBUTION_ID') {
     console.warn('\n=============================================================');
     console.warn('WARNING: CloudFront Distribution ID has not been configured.');
-    console.warn('Please update config.json with your specific credentials:');
+    console.warn('Please update config.json with your distribution ID and AWS profile name:');
     console.warn('{\n  "distributionId": "E123456789ABCD",\n  "awsProfile": "my-aws-profile"\n}');
     console.warn('=============================================================\n');
     if (!dryRun) {
