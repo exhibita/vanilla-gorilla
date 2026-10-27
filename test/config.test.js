@@ -16,12 +16,13 @@ function build(options) {
     return site;
 }
 
+// This test also runs in sites made from the template, so it checks the shape, not the values.
 test('the committed config.json is valid JSON with the three site values', () => {
     const config = JSON.parse(fs.readFileSync(path.join(ROOT, 'config.json'), 'utf8'));
     assert.match(config._comment, /secrets/i);
-    assert.equal(config.siteUrl, DEFAULT_SITE_URL);
-    assert.equal(typeof config.siteTitle, 'string');
-    assert.equal(typeof config.siteDescription, 'string');
+    assert.match(config.siteUrl, /^https?:\/\/.+[^/]$/, 'siteUrl must be a full address with no trailing slash');
+    assert.ok(typeof config.siteTitle === 'string' && config.siteTitle.length > 0);
+    assert.ok(typeof config.siteDescription === 'string' && config.siteDescription.length > 0);
 });
 
 test('config.json sets the address, title and description in the RSS feed and sitemap', () => {
