@@ -16,7 +16,6 @@ ENV/
 # Local env files
 .env*.local
 .env
-config.json
 
 # System files
 .DS_Store

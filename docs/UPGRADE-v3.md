@@ -183,6 +183,40 @@ Remove the hard-coded links from the file.
 
 For the classes and the theming options, see [THEMING.md](./THEMING.md#4-theming-a-links-page).
 
+## Late addition: the site's address in config.json
+
+Before this change, the template's `.gitignore` listed `config.json`. So GitHub Actions built some sites with the template's address and title. The RSS feed and the sitemap of these sites point to `https://exhibita.github.io/vanilla-gorilla`.
+
+The template now commits `config.json`. The `build.js` file in the template also has these changes:
+
+- The `SITE_URL`, `SITE_TITLE` and `SITE_DESCRIPTION` environment variables override `config.json`.
+- A GitHub Actions build shows a warning when `siteUrl` is the template's address.
+
+To get these changes, copy `build.js` as in step 2 of "Upgrade a site".
+
+To check an existing site:
+
+1. Open `https://<your-site>/rss.xml` in a browser.
+2. Find the first `<link>` line. If it shows your site's address, and `config.json` is in your repository, stop here.
+3. In `.gitignore`, remove the line `config.json`.
+4. Open `config.json` in the root of the site repository. If the file does not exist, create it.
+5. Set the three values. Keep the other keys that the file has, for example `distributionId` and `awsProfile`:
+
+   ```json
+   {
+     "_comment": "WARNING: Do NOT put secrets (passwords, API keys, tokens, access keys) in this file. It is committed to the GitHub repository.",
+     "siteUrl": "https://www.example.com",
+     "siteTitle": "My Site",
+     "siteDescription": "A short description of my site."
+   }
+   ```
+
+6. Make sure that the file has no secrets. Git commits the file.
+7. Run `npm run build`.
+8. Open `dist/rss.xml` and `dist/sitemap.xml`. Make sure that they use your site's address.
+9. Commit `.gitignore` and `config.json`, then push.
+10. After the deploy, open `https://<your-site>/rss.xml` again. Make sure that it shows your site's address.
+
 ## Suggested Prompt for AI assisted upgrade:
 
 If your site has already been upgraded to v2 template, you can try the following prompt to let your favorite AI agent perform your upgrade to Template version 3:

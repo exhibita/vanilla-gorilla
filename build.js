@@ -13,11 +13,13 @@ const execPromise = promisify(exec);
 const SRC_DIR = './src';
 const DIST_DIR = './dist';
 
-// Default configuration (can be overriden via config.json or env variables)
+// Default configuration (overridden by config.json, then by env variables)
+const DEFAULT_SITE_URL = 'https://exhibita.github.io/vanilla-gorilla';
+const TEMPLATE_REPOSITORY = 'exhibita/vanilla-gorilla';
 const config = {
-    siteUrl: process.env.SITE_URL || 'https://exhibita.github.io/vanilla-gorilla',
-    siteTitle: process.env.SITE_TITLE || 'Vanilla Gorilla',
-    siteDescription: process.env.SITE_DESCRIPTION || 'Vanilla HTML/CSS/JS compiler with agentic superpowers.',
+    siteUrl: DEFAULT_SITE_URL,
+    siteTitle: 'Vanilla Gorilla',
+    siteDescription: 'Vanilla HTML/CSS/JS compiler with agentic superpowers.',
     rssItemLimit: 20,
     postsPerPage: 10
 };
@@ -30,6 +32,16 @@ try {
     }
 } catch (err) {
     console.warn('Warning: Failed to parse config.json, using defaults.', err.message);
+}
+
+// Environment variables win over config.json
+if (process.env.SITE_URL) config.siteUrl = process.env.SITE_URL;
+if (process.env.SITE_TITLE) config.siteTitle = process.env.SITE_TITLE;
+if (process.env.SITE_DESCRIPTION) config.siteDescription = process.env.SITE_DESCRIPTION;
+
+// A site deployed with the template's address gets a wrong RSS feed and sitemap
+if (process.env.GITHUB_ACTIONS === 'true' && config.siteUrl === DEFAULT_SITE_URL && process.env.GITHUB_REPOSITORY !== TEMPLATE_REPOSITORY) {
+    console.warn(`Warning: siteUrl is the template default (${DEFAULT_SITE_URL}). Set siteUrl, siteTitle and siteDescription in config.json, so the RSS feed and sitemap use this site's address.`);
 }
 
 const { siteUrl: SITE_URL, siteTitle: SITE_TITLE, siteDescription: SITE_DESCRIPTION, rssItemLimit: RSS_ITEM_LIMIT, postsPerPage: POSTS_PER_PAGE } = config;

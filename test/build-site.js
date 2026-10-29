@@ -10,7 +10,8 @@ const BUILD_JS = path.join(ROOT, 'build.js');
 // Build a throwaway site in a temp directory and return helpers to inspect it.
 // pages maps a path relative to src/ to the file content.
 // fullSrc copies the whole template src/; otherwise only templates/ and skeletons/ are copied.
-export function buildSite(pages = {}, { fullSrc = false } = {}) {
+// config is written to config.json in the site root. env adds to the build's environment variables.
+export function buildSite(pages = {}, { fullSrc = false, config, env = {} } = {}) {
     const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'vg-test-'));
     const src = path.join(dir, 'src');
     const copy = sub => fs.cpSync(path.join(ROOT, 'src', sub), path.join(src, sub), { recursive: true });
@@ -28,7 +29,11 @@ export function buildSite(pages = {}, { fullSrc = false } = {}) {
         fs.writeFileSync(file, content, 'utf8');
     }
 
-    const result = spawnSync(process.execPath, [BUILD_JS], { cwd: dir, encoding: 'utf8' });
+    if (config) {
+        fs.writeFileSync(path.join(dir, 'config.json'), JSON.stringify(config), 'utf8');
+    }
+
+    const result = spawnSync(process.execPath, [BUILD_JS], { cwd: dir, encoding: 'utf8', env: { ...process.env, ...env } });
 
     return {
         dir,

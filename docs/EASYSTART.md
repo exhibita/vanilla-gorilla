@@ -63,7 +63,28 @@ where SITENAME is the name of the folder/directory to hold your new site. This c
 - grab the latest version of Vanilla Gorilla
 - clone a copy of this into a folder named SITENAME
 - setup up a local Git Repository for version control for you 
+- ask for your site's address (URL), title and description, and write them to `config.json`
 - provide you with a list of immediate next steps to begin working
+
+### Set your site's address, title and description
+
+The RSS feed and the sitemap use the values in `config.json` in your SITENAME folder:
+
+```json
+{
+  "_comment": "WARNING: Do NOT put secrets (passwords, API keys, tokens, access keys) in this file. It is committed to the GitHub repository.",
+  "siteUrl": "https://ACCOUNTNAME.github.io/SITENAME",
+  "siteTitle": "My Site",
+  "siteDescription": "A short description of my site."
+}
+```
+
+1. Open `config.json`.
+2. Make sure that `siteUrl` is the address of your live site. Do not end it with `/`. If you use your own domain, use that domain, for example `https://www.example.com`.
+3. Make sure that `siteTitle` and `siteDescription` are correct.
+4. Save the file before your first deploy.
+
+Do not put secrets in `config.json`. Git commits the file, and everyone who can see your repository can read it.
 
 ### Source Control connections
 
@@ -134,6 +155,8 @@ Since Vanilla Gorilla's sole purpose is to allow you to quickly and easily creat
 - deploy.yml is designed to trigger an insert (or update) of files and other assets to a site hosted on S3 and using CloudFront (both products of AWS). Please see the blog post about [Choosing Your Hosting Strategy](../src/blog/choosing-your-hosting-strategy/index.md) (or on [our site](https://vg.exhibita.com/blog/choosing-your-hosting-strategy/) if you've cleared the initially loaded blog pages).
 - pages.yml is desi9gned to deploy the contents of your site to GitHub hosted sites.
   
+Before your first deploy, make sure that `siteUrl`, `siteTitle` and `siteDescription` in `config.json` are correct. If a GitHub Actions build uses the template's address, the build log shows a warning.
+
 Either of these options will require that you create to:
 1. create the initially hosted storage in AWS or GitHub
 2. add new Repository environmental variables in your GitHub project's settings under Secrets | Repository Secrets.
