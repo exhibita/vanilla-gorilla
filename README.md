@@ -136,3 +136,6 @@ If you are using an agentic IDE (like Antigravity IDE), the AI assistant is conf
 
 This project is licensed under the GNU Affero General Public License v3 (AGPLv3). See the [LICENSE](file:///./vanilla-gorilla/LICENSE) file for more details.
 
+## Got Crabs?
+
+[![shell-pet badge for exhibita/vanilla-gorilla](https://shell-pet.vercel.app/api/pet/exhibita/vanilla-gorilla.svg?layout=square&theme=dark)](https://github.com/exhibita/vanilla-gorilla)
