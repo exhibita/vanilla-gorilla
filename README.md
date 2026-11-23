@@ -49,6 +49,11 @@ To scaffold a new page or blog post with appropriate relative path nesting:
   ```bash
   npm run create-page -- page my-custom-page
   ```
+- **Blog post image and badge**: add `image:` (a path from `src/` or a full URL) and `badge:` (a short label) to the front matter of a blog post. The blog index and the recent posts list then show them (see [docs/UPGRADE-v4.md](docs/UPGRADE-v4.md)):
+  ```yaml
+  image: ./images/blog/my-post.png   # optional
+  badge: Hair Care                    # optional
+  ```
 - **Gallery**: create a Markdown page with the `gallery` skeleton, then add an `images:` list to its front matter (see [docs/UPGRADE-v2.md](docs/UPGRADE-v2.md#galleries)):
   ```bash
   npm run create-md -- gallery gallery/travel-photos

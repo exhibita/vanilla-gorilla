@@ -378,6 +378,62 @@ ul.wp-block-latest-posts a {
   font-size: 1.05rem;
 }
 
+/* Post image and badge (front matter "image:" and "badge:") */
+.post-thumbnail {
+  display: block;
+  margin: -2.5rem -2.5rem 1.75rem;
+}
+
+.post-thumbnail img {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  border-radius: var(--radius-md) var(--radius-md) 0 0;
+}
+
+.entry-badge,
+.wp-block-latest-posts__badge {
+  display: inline-block;
+  margin-bottom: 0.5rem;
+  padding: 0.15rem 0.65rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-light);
+  background-color: var(--color-secondary);
+  border-radius: var(--radius-sm);
+}
+
+ul.wp-block-latest-posts li.has-post-thumbnail {
+  display: grid;
+  grid-template-columns: 7rem 1fr;
+  column-gap: 1.25rem;
+  align-items: start;
+}
+
+.wp-block-latest-posts__featured-image {
+  grid-column: 1;
+  grid-row: 1 / span 4;
+}
+
+.wp-block-latest-posts__featured-image img {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: var(--radius-sm);
+}
+
+ul.wp-block-latest-posts li.has-post-thumbnail > :not(.wp-block-latest-posts__featured-image) {
+  grid-column: 2;
+  justify-self: start;
+}
+
+.wp-block-latest-posts__post-date,
+.wp-block-latest-posts__post-excerpt {
+  display: block;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
 /* SITEMAP / HERO SECTION styling */
 .hero {
   padding: 4rem 0;
