@@ -31,6 +31,8 @@ If you replace the theme's HTML, these exact classes/IDs must still exist wherev
 | `#post-nav-placeholder` | `blog-skeleton.html` | Filled with prev/next links after all posts are compiled (`build.js:509-540`) |
 | `#blog-post-list` | `templates/blog-index.html` | Filled with the generated list of blog post `<article>` entries |
 | `#gallery-list` | `templates/gallery-index.html` | Filled with the generated list of gallery entries |
+| `.post-thumbnail`, `.entry-badge` | generated blog index entries | Added to a post's `<article>` only when the post has `image:` or `badge:` front matter. The `<article>` also gets the class `has-post-thumbnail` when it has an image. Style these in `style.css` |
+| `.wp-block-latest-posts__featured-image`, `__badge`, `__post-date`, `__post-excerpt` | `templates/recent-posts.html` (generated) | Added to a post's `<li>` only when the post has `image:` or `badge:` front matter. Style these in `style.css` |
 | `#gallery` | `gallery-skeleton.html` | Filled with one `.gallery-item` for each entry in the `images:` front matter list |
 | `#gallery-lightboxes` | `gallery-skeleton.html` | Filled with one CSS-only `.lightbox-target` (`#img1`, `#img2`, ...) for each `images:` entry |
 | `#links` | `links-skeleton.html` | Filled with one `a.link-button` for each `links:` entry |
